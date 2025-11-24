@@ -118,10 +118,10 @@ function App() {
               disableAnimation={false}
               enableMouseInteraction={true}
               mouseRadius={0.3}
-              colorNum={3} 
+              colorNum={30} 
               waveAmplitude={0.3}
               waveFrequency={3}
-              waveSpeed={0.05}
+              waveSpeed={0.02}
             />
           </div>
           <div className="relative z-10 text-center px-4">
