@@ -72,7 +72,7 @@ const WorkSection = () => {
   return (
     <div id="work" className="min-h-screen p-8 md:p-16 bg-black">
       <h2 className="text-5xl md:text-7xl font-bold mb-12 text-white">
-        Work
+        Selected Works
       </h2>
 
       {/* --- Project Grid --- */}

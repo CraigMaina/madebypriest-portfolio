@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ContactForm = () => {
+const ContactForm = ({ referralProject }) => {
   return (
     <div id="contact" className="relative w-full min-h-screen overflow-hidden flex items-center justify-center p-8 md:p-16">
       
@@ -17,39 +17,55 @@ const ContactForm = () => {
       </video>
 
       {/* --- 2. Dark Overlay --- */}
-      {/* Increased darkness a bit for better text contrast */}
-      <div className="absolute inset-0 bg-black/70 z-10" />
+      <div className="absolute inset-0 bg-black/80 z-10" />
 
-      {/* --- 3. Content Container (NOW A 2-COLUMN GRID) --- */}
-      <div className="relative z-20 w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
+      <div className="relative z-20 w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-start">
         
-        {/* --- COLUMN 1: Personal Mission --- */}
-        <div className="text-white">
+        {/* --- COLUMN 1: The "About" Copy --- */}
+        <div className="text-white space-y-6">
           <img 
-            src="/images/profile.jpg" // <-- ADD YOUR PHOTO HERE
+            src="/images/profile.jpg"
             alt="MadeByPriest"
-            className="w-40 h-40 md:w-48 md:h-48 rounded-full object-cover mb-6 border-4 border-gray-700"
+            className="w-32 h-32 rounded-full object-cover border-2 border-white/20 mb-4"
             onError={(e) => { e.target.src = 'https://placehold.co/200x200/1a1a1a/fff?text=Priest'; }}
           />
-          <h2 className="text-5xl md:text-7xl font-bold">
-            Let's Create.
+          
+          {/* Headline derived from [cite: 3] */}
+          <h2 className="text-4xl md:text-6xl font-bold font-heading leading-none">
+            Don't just look good.<br/>
+            <span className="text-gray-400">Connect.</span>
           </h2>
-          <p className="text-lg text-gray-300 mt-6 max-w-lg">
-            "I'm Priest, a visual artist specializing in creating
-            immersive experiences. My work blends cinematic techniques with
-            generative art to produce visuals that aren't just seen, but felt.
-            If you have a vision, I have the craft to bring it to life."
+
+          {/* Body copy from [cite: 4, 5] */}
+          <p className="text-lg text-gray-300 leading-relaxed">
+            "My specialty is cinematic, high-quality editing that makes your brand feel bigger, sharper, and more magnetic. From campaign reels to full-length productions, I shape each frame to tell a story people actually want to watch, and remember."
+          </p>
+
+          {/* Closing statement from [cite: 8] */}
+          <p className="text-lg text-gray-300 leading-relaxed font-medium border-l-2 border-lime-400 pl-4">
+            "I deliver fast, collaborative, premium editing that feels effortless for you, and unforgettable for your audience."
           </p>
         </div>
 
         {/* --- COLUMN 2: Contact Form --- */}
-        <div className="w-full">
+        <div className="w-full bg-white/5 p-8 rounded-3xl backdrop-blur-sm border border-white/10">
           <form 
-            action="https://formspree.io/f/your-formspree-id" // <-- REMEMBER TO REPLACE THIS
+            action="https://formspree.io/f/your-formspree-id"
             method="POST" 
             className="flex flex-col gap-6"
           >
-            {/* Name Field */}
+            <input 
+              type="hidden" 
+              name="Interested In Project" 
+              value={referralProject || "General Inquiry"} 
+            />
+
+            {referralProject && (
+              <div className="text-lime-400 text-sm font-medium">
+                Inquiring about: {referralProject}
+              </div>
+            )}
+
             <div>
               <label htmlFor="name" className="sr-only">Name</label>
               <input 
@@ -58,11 +74,10 @@ const ContactForm = () => {
                 id="name" 
                 placeholder="Your Name" 
                 required 
-                className="w-full p-4 bg-transparent border-b border-gray-500 text-white placeholder-gray-400 focus:outline-none focus:border-white transition-colors"
+                className="w-full p-4 bg-transparent border-b border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:border-white transition-colors"
               />
             </div>
 
-            {/* Email Field */}
             <div>
               <label htmlFor="email" className="sr-only">Email</label>
               <input 
@@ -71,28 +86,26 @@ const ContactForm = () => {
                 id="email" 
                 placeholder="Your Email" 
                 required 
-                className="w-full p-4 bg-transparent border-b border-gray-500 text-white placeholder-gray-400 focus:outline-none focus:border-white transition-colors"
+                className="w-full p-4 bg-transparent border-b border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:border-white transition-colors"
               />
             </div>
 
-            {/* Message Field */}
             <div>
               <label htmlFor="message" className="sr-only">Message</label>
               <textarea 
                 name="message" 
                 id="message" 
                 rows="4" 
-                placeholder="Tell me about your project..." 
+                placeholder={referralProject ? `I saw your work on ${referralProject} and want something similar...` : "Tell me about your vision..."}
                 required 
-                className="w-full p-4 bg-transparent border-b border-gray-500 text-white placeholder-gray-400 focus:outline-none focus:border-white transition-colors"
+                className="w-full p-4 bg-transparent border-b border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:border-white transition-colors"
               />
             </div>
 
-            {/* Submit Button */}
             <div>
               <button 
                 type="submit" 
-                className="w-full px-8 py-4 bg-white text-black font-semibold rounded-full hover:scale-105 transition-transform"
+                className="w-full px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors"
               >
                 Send Message
               </button>
