@@ -50,6 +50,8 @@ const CurvedLoop = ({
 
   useEffect(() => {
     if (!spacing || !ready) return;
+    // Respect prefers-reduced-motion: hold the marquee static (dragging still works).
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     let frame = 0;
     const step = () => {
       if (!dragRef.current && textPathRef.current) {
