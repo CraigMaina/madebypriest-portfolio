@@ -1,4 +1,3 @@
-import React from 'react';
 // 1. Import the new component
 import { ImgComparisonSlider } from '@img-comparison-slider/react';
 

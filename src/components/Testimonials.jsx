@@ -1,5 +1,3 @@
-import React from 'react';
-
 // --- 1. Data for Your Testimonials ---
 const testimonials = [
   {
@@ -42,7 +40,7 @@ const Testimonials = () => {
             <li key={index} className="flex-shrink-0 w-80 md:w-96">
               <div className="bg-ink-800 p-6 rounded-card shadow-card border border-ink-700 h-full">
                 <p className="text-base md:text-lg text-fog-300 italic leading-relaxed">
-                  "{item.quote}"
+                  &ldquo;{item.quote}&rdquo;
                 </p>
                 <p className="text-fog-100 font-semibold mt-4">
                   {item.name}
@@ -60,7 +58,7 @@ const Testimonials = () => {
             <li key={index} className="flex-shrink-0 w-80 md:w-96">
               <div className="bg-ink-800 p-6 rounded-card shadow-card border border-ink-700 h-full">
                 <p className="text-base md:text-lg text-fog-300 italic leading-relaxed">
-                  "{item.quote}"
+                  &ldquo;{item.quote}&rdquo;
                 </p>
                 <p className="text-fog-100 font-semibold mt-4">
                   {item.name}

@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 
 // The Three.js hero is the heaviest module in the app. Lazy-import it so it is
 // code-split into its own chunk and only fetched when we actually decide to run

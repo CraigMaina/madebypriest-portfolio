@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 // Dark cinematic poster shown before the background video loads (and as the
 // permanent backdrop under prefers-reduced-motion). Self-contained, no request.
@@ -135,7 +135,7 @@ const ContactForm = ({ referralProject }) => {
           />
 
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold font-heading leading-tight">
-            Don't just look good.<br/>
+            Don&rsquo;t just look good.<br/>
             <span className="text-fog-500">Connect.</span>
           </h2>
 
