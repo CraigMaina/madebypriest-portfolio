@@ -1,5 +1,9 @@
 import { createClient } from '@sanity/client';
-import imageUrlBuilder from '@sanity/image-url';
+import imageUrlBuilderDefault, * as imageUrlBuilderNs from '@sanity/image-url';
+
+// Prefer the named export (the default export is deprecated), falling back for
+// older versions.
+const buildImageBuilder = imageUrlBuilderNs.createImageUrlBuilder || imageUrlBuilderDefault;
 
 const projectId = import.meta.env.VITE_SANITY_PROJECT_ID;
 const dataset = import.meta.env.VITE_SANITY_DATASET || 'production';
@@ -13,7 +17,7 @@ export const sanityClient = projectId
 
 export const isSanityConfigured = Boolean(sanityClient);
 
-const builder = sanityClient ? imageUrlBuilder(sanityClient) : null;
+const builder = sanityClient ? buildImageBuilder(sanityClient) : null;
 
 // Returns a URL string for a Sanity image ref, or null if not resolvable.
 export const imageUrl = (source, width) => {

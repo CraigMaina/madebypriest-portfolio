@@ -180,7 +180,9 @@ const CardNav = ({
             {logo ? (
                  <img src={logo} alt={logoAlt} className="logo h-[28px]" />
             ) : (
-                <span className="text-xl font-bold text-fog-100">MadeByPriest</span>
+                <span className="font-heading text-lg md:text-xl font-bold tracking-tight text-fog-100">
+                  Made by Priest
+                </span>
             )}
           </div>
 

@@ -127,11 +127,11 @@ const ContactForm = ({ referralProject }) => {
           </h2>
 
           <p className="text-base md:text-lg text-fog-300 leading-relaxed">
-            My specialty is cinematic, high-end editing that makes your brand feel bigger, sharper, and more magnetic. From campaign reels to full-length films, I shape every frame to tell a story people actually want to watch — and remember.
+            My specialty is cinematic, high-end editing that makes your brand feel bigger, sharper, and more magnetic. From campaign reels to full-length productions, I shape every frame to tell a story people actually want to watch and remember.
           </p>
 
           <p className="text-base md:text-lg text-fog-300 leading-relaxed font-medium border-l-2 border-accent pl-4">
-            Fast, collaborative, premium editing that feels effortless for you — and unforgettable for your audience.
+            Fast, collaborative, premium editing that feels effortless for you, and unforgettable for your audience.
           </p>
 
           {hasBooking && (
