@@ -1,38 +1,46 @@
 import React from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 
+const SITE_URL = 'https://madebypriest.vercel.app';
+const OG_IMAGE = `${SITE_URL}/og-image.jpg`; // 1200x630 — supply real asset
+
 const SEO = () => {
   return (
     <HelmetProvider>
       <Helmet>
-        {/* Title: Targets both "Cinematic" (High-End) and "Social" (Creators/Ads) */}
-        <title>MadeByPriest | Cinematic Social Content & Performance Creative</title>
-        
-        {/* Description: Focuses on "Attention," "Ads," and "Quality" */}
-        <meta name="description" content="I turn raw footage into high-performing video ads and cinematic social content. Remote video editor for brands, agencies, and creators who need scroll-stopping visuals." />
-        
-        {/* Keywords: Mixed bag of High-End terms and Social Media terms */}
-        <meta name="keywords" content="
-          Instagram Reels Editor, 
-          TikTok Video Ads, 
-          Performance Creative, 
-          Social Media Video Production,
-          Remote Video Editor, 
-          VFX for Social Media, 
-          Content Creator Editor,
-          Direct Response Video,
-          High-End Reels,
-          Cinematic Vlogs
-        " />
-        
-        <meta name="author" content="MadeByPriest" />
-        
+        <html lang="en" />
+        <title>Made by Priest — Cinematic Video Editing for Brands &amp; Creators</title>
+        <meta
+          name="description"
+          content="Cinematic video editing for brands, agencies, and creators. I turn raw footage into scroll-stopping ads and story-driven films people remember."
+        />
+        <meta name="author" content="Made by Priest" />
+        <meta name="robots" content="index, follow" />
+        <meta name="theme-color" content="#0A0A0B" />
+        <link rel="canonical" href={`${SITE_URL}/`} />
+
         {/* Open Graph */}
-        <meta property="og:title" content="MadeByPriest | Videos That Stop The Scroll" />
-        <meta property="og:description" content="Premium editing for brands and creators. Turn your content into a blockbuster." />
-        <meta property="og:image" content="https://madebypriest.vercel.app/og-image.jpg" />
-        <meta property="og:url" content="https://madebypriest.vercel.app/" />
         <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Made by Priest" />
+        <meta property="og:url" content={`${SITE_URL}/`} />
+        <meta property="og:title" content="Made by Priest — Videos That Feel Like Blockbusters" />
+        <meta
+          property="og:description"
+          content="Cinematic editing that turns brands into icons and viewers into fans. Scroll-stopping ads and story-driven films for brands, agencies, and creators."
+        />
+        <meta property="og:image" content={OG_IMAGE} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Made by Priest — cinematic video editing" />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Made by Priest — Videos That Feel Like Blockbusters" />
+        <meta
+          name="twitter:description"
+          content="Cinematic editing that turns brands into icons and viewers into fans. Scroll-stopping ads and story-driven films for brands, agencies, and creators."
+        />
+        <meta name="twitter:image" content={OG_IMAGE} />
       </Helmet>
     </HelmetProvider>
   );
