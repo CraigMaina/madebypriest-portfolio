@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 // --- Import All Components ---
 import CardNav from './components/CardNav';
-import Dither from './components/Dither';
-// import LogoLoop from './components/LogoLoop'; // REMOVED
+import HeroBackground from './components/HeroBackground';
 import CurvedLoop from './components/CurvedLoop'; // ADDED
 import WorkSection from './components/WorkSection';
 import BeforeAfterSlider from './components/BeforeAfterSlider';
@@ -51,18 +50,34 @@ function App() {
   const [isSiteVisible, setIsSiteVisible] = useState(false);
 
   useEffect(() => {
-    const loadTimer = setTimeout(() => {
-      setIsLoading(false); 
-    }, 2000);
+    let unmountTimer;
+    let settled = false;
 
-    const unmountTimer = setTimeout(() => {
-      setIsSiteVisible(true); 
-    }, 2800); 
-
-    return () => {
-      clearTimeout(loadTimer);
-      clearTimeout(unmountTimer);
+    // Asset-driven: reveal once fonts are ready (the hero visual loads async on
+    // its own). A short minimum avoids a splash flash; a hard cap guarantees we
+    // never hang on a stalled asset.
+    const reveal = () => {
+      if (settled) return;
+      settled = true;
+      setIsLoading(false);
+      // Let the 1s fade-in run before unmounting the preloader from the tree.
+      unmountTimer = setTimeout(() => setIsSiteVisible(true), 800);
     };
+
+    const minSplash = 400;
+    const started = performance.now();
+    const revealAfterMin = () => {
+      const elapsed = performance.now() - started;
+      setTimeout(reveal, Math.max(0, minSplash - elapsed));
+    };
+
+    const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
+    Promise.race([
+      fontsReady,
+      new Promise((res) => setTimeout(res, 3000)), // safety cap
+    ]).then(revealAfterMin);
+
+    return () => clearTimeout(unmountTimer);
   }, []);
 
   return (
@@ -84,12 +99,12 @@ function App() {
         {/* --- 2. Hero Section --- */}
         <div className="relative min-h-screen flex flex-col items-center justify-center">
           <div className="absolute inset-0 z-0">
-            <Dither
+            <HeroBackground
               waveColor={[1.0, 1.0, 1.0]}
               disableAnimation={false}
               enableMouseInteraction={true}
               mouseRadius={0.3}
-              colorNum={30} 
+              colorNum={30}
               waveAmplitude={0.3}
               waveFrequency={2.4}
               waveSpeed={0.05}
