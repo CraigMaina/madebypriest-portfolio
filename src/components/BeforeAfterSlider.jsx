@@ -2,6 +2,18 @@ import React from 'react';
 // 1. Import the new component
 import { ImgComparisonSlider } from '@img-comparison-slider/react';
 
+// Intentional, self-contained fallbacks (no external placeholder service) until
+// real grading stills are supplied. "Before" reads flat/desaturated; "After"
+// reads cinematically graded, so the section still communicates the transformation.
+const svgFallback = (label, from, to) =>
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${from}"/><stop offset="1" stop-color="${to}"/></linearGradient></defs><rect width="800" height="450" fill="url(#g)"/><text x="50%" y="50%" fill="#F5F5F7" font-family="sans-serif" font-size="28" font-weight="700" letter-spacing="4" text-anchor="middle" dominant-baseline="middle">${label}</text></svg>`
+  );
+
+const BEFORE_FALLBACK = svgFallback('BEFORE', '#3a3a3d', '#101012');
+const AFTER_FALLBACK = svgFallback('AFTER', '#E6B450', '#1A1A1D');
+
 // --- 1. Data for Your Sliders ---
 // (This data stays the same)
 const sliders = [
@@ -47,14 +59,18 @@ const BeforeAfterSlider = () => {
                   <img
                     slot="first"
                     src={slider.before}
-                    alt="Before"
-                    onError={(e) => { e.target.src = 'https://placehold.co/800x450/000/fff?text=Before'; }}
+                    alt={`${slider.title} — ungraded footage before color grading`}
+                    width="800"
+                    height="450"
+                    onError={(e) => { e.target.src = BEFORE_FALLBACK; }}
                   />
                   <img
                     slot="second"
                     src={slider.after}
-                    alt="After"
-                    onError={(e) => { e.target.src = 'https://placehold.co/800x450/333/fff?text=After'; }}
+                    alt={`${slider.title} — final cinematic color grade`}
+                    width="800"
+                    height="450"
+                    onError={(e) => { e.target.src = AFTER_FALLBACK; }}
                   />
                 </ImgComparisonSlider>
 
