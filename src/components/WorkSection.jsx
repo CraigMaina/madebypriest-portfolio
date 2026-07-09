@@ -2,20 +2,27 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { GoX, GoArrowUpRight } from 'react-icons/go';
 import { FaPlay } from 'react-icons/fa';
 import { useContent } from '../sanity/content';
+import { useBooking } from './BookingProvider';
 import { FALLBACK_THUMB } from '../data/placeholders';
 
 const aspectClass = (orientation) =>
   orientation === 'portrait' ? 'aspect-[9/16]' : orientation === 'square' ? 'aspect-square' : 'aspect-video';
 
+// A reel is only playable when it points at a real hosted file. The demo/fallback
+// entries use placeholder local paths that don't exist, so we show a "coming soon"
+// state instead of a broken native player (which would throw load errors).
+const isPlayable = (url) => /^https?:\/\//i.test(url || '');
+
 const FILTERS = [
   { label: 'All', match: () => true },
   { label: 'Reels', match: (p) => p.type === 'Reel' },
-  { label: 'Films', match: (p) => p.type === 'Film' },
+  { label: 'Widescreen', match: (p) => p.type === 'Widescreen' },
 ];
 
 // --- Main Section ---
 const WorkSection = ({ setReferralProject }) => {
   const projects = useContent('projects');
+  const { hasBooking, openBooking } = useBooking();
   const [selectedProject, setSelectedProject] = useState(null);
   const [filter, setFilter] = useState('All');
 
@@ -27,11 +34,16 @@ const WorkSection = ({ setReferralProject }) => {
   const openModal = (project) => setSelectedProject(project);
   const closeModal = () => setSelectedProject(null);
 
-  // Starting a project from a reel stamps its title into the contact form.
+  // Starting a project from a reel stamps its title into the contact form, then
+  // opens the booking scheduler (or scrolls to the form if booking isn't set up).
   const startProject = (title) => {
     setReferralProject?.(title);
     setSelectedProject(null);
-    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+    if (hasBooking) {
+      openBooking();
+    } else {
+      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -49,10 +61,10 @@ const WorkSection = ({ setReferralProject }) => {
               Selected Work
             </p>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold text-fog-100">
-              Reels &amp; films that perform
+              Reels &amp; videos that perform
             </h2>
             <p className="mt-3 text-base md:text-lg text-fog-300 max-w-xl">
-              Vertical reels that stop the scroll, landscape films that hold the room.
+              Vertical reels that stop the scroll, widescreen edits that hold the room.
             </p>
           </div>
 
@@ -214,7 +226,7 @@ const VideoModal = ({ project, onClose, onStartProject }) => {
         <div className="fixed inset-0 -z-10" onClick={onClose} aria-hidden="true" />
 
         <div className={`relative w-full ${aspectClass(project.orientation)} max-h-[72vh] mx-auto overflow-hidden rounded-card bg-black border border-ink-700`}>
-          {videoFailed ? (
+          {!isPlayable(project.videoUrl) || videoFailed ? (
             <div
               className="w-full h-full flex flex-col items-center justify-center bg-center bg-cover"
               style={{ backgroundImage: `url(${project.thumbnail})` }}
