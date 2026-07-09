@@ -13,11 +13,13 @@ import Preloader from './components/Preloader';
 import SEO from './components/SEO'; // Import SEO
 
 // --- Component Data ---
+// Card background/text colors mirror the design-system tokens (ink-700/600/500,
+// fog-100). They live here because CardNav applies them as inline styles.
 const navItems = [
   {
     label: "Films",
-    bgColor: "#1A1A1A",
-    textColor: "#fff",
+    bgColor: "#1A1A1D", // ink-700
+    textColor: "#F5F5F7", // fog-100
     links: [
       { label: "Main Portfolio", href: "#work", ariaLabel: "See Main Portfolio" },
       { label: "The Craft", href: "#craft", ariaLabel: "See The Craft" }
@@ -25,8 +27,8 @@ const navItems = [
   },
   {
     label: "Studio",
-    bgColor: "#2B2B2B",
-    textColor: "#fff",
+    bgColor: "#26262B", // ink-600
+    textColor: "#F5F5F7", // fog-100
     links: [
       { label: "Testimonials", href: "#trusted", ariaLabel: "See Testimonials" },
       { label: "Philosophy", href: "#contact", ariaLabel: "Read my philosophy" }
@@ -34,8 +36,8 @@ const navItems = [
   },
   {
     label: "Contact",
-    bgColor: "#3C3C3C",
-    textColor: "#fff",
+    bgColor: "#33333A", // ink-500
+    textColor: "#F5F5F7", // fog-100
     links: [
       { label: "Inquire now", href: "mailto:hello@madebypriest.com", ariaLabel: "Email me" },
       { label: "Start Project", href: "#contact", ariaLabel: "Start a project" }
@@ -68,22 +70,16 @@ function App() {
       <SEO />
       {!isSiteVisible && <Preloader isLoading={isLoading} />}
 
-      <div 
+      <div
         className={`
-          bg-black text-white min-h-screen
+          bg-ink-900 text-fog-100 min-h-screen
           transition-opacity duration-1000 ease-in-out
           ${isLoading ? 'opacity-0' : 'opacity-100'}
         `}
       >
-        
+
         {/* --- 1. Navigation --- */}
-        <CardNav
-          items={navItems}
-          baseColor="#000"
-          menuColor="#fff"
-          buttonBgColor="#fff"
-          buttonTextColor="#000"
-        />
+        <CardNav items={navItems} />
 
         {/* --- 2. Hero Section --- */}
         <div className="relative min-h-screen flex flex-col items-center justify-center">
@@ -99,21 +95,21 @@ function App() {
               waveSpeed={0.05}
             />
           </div>
-          <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+          <div className="relative z-10 text-center px-5 md:px-8 max-w-5xl mx-auto">
             {/* NEW HEADLINE [cite: 12] */}
-            <h1 className="text-5xl md:text-8xl font-bold uppercase tracking-tighter font-heading leading-tight">
-              Videos That Feel Like <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">Blockbusters.</span>
+            <h1 className="text-4xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tighter font-heading leading-tight">
+              Videos That Feel Like <span className="text-transparent bg-clip-text bg-gradient-to-r from-fog-100 to-fog-500">Blockbusters.</span>
             </h1>
-            
+
             {/* NEW SUBHEADLINE [cite: 12] */}
-            <p className="text-xl md:text-2xl text-gray-300 mt-6 font-light">
+            <p className="text-lg md:text-2xl text-fog-300 mt-6 font-light">
               Editing That Turns Brands Into Icons.
             </p>
-            
+
             {/* NEW CTA [cite: 14] */}
             <a
               href="#contact"
-              className="inline-block mt-8 px-8 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform tracking-wide"
+              className="inline-block mt-8 px-8 py-4 bg-accent text-ink-900 font-bold rounded-full hover:bg-accent-hover hover:scale-105 transition duration-300 ease-out tracking-wide"
             >
               Let's Make Your Story Unforgettable
             </a>
@@ -121,7 +117,7 @@ function App() {
         </div>
 
         {/* --- 3. Curved Text Loop --- */}
-        <div className="w-full bg-black">
+        <div className="w-full bg-ink-900">
             <CurvedLoop 
                 marqueeText="Helping ✦ Brands ✦ Tell ✦ Stories ✦ That ✦ Sell ✦"
                 speed={3}
