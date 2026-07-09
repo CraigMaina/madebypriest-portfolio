@@ -20,7 +20,9 @@ const CurvedLoop = ({
   const [offset, setOffset] = useState(0);
   const uid = useId();
   const pathId = `curve-${uid}`;
-  const pathD = `M-100,40 Q500,${40 + curveAmount} 1540,40`;
+  // Baseline centered in the (shorter) viewBox so the band can be slim without
+  // clipping the glyphs.
+  const pathD = `M-100,56 Q500,${56 + curveAmount} 1540,56`;
 
   const dragRef = useRef(false);
   const lastXRef = useRef(0);
@@ -110,11 +112,10 @@ const CurvedLoop = ({
       onPointerLeave={endDrag}
     >
       <svg
-        // Band height scales with width; cap it on larger screens (was ~17% of
-        // viewport width) and crop cleanly so it doesn't dominate on desktop.
-        className="select-none w-full overflow-hidden block aspect-[100/12] md:max-h-[104px] lg:max-h-[92px] text-[5rem] md:text-[4rem] font-bold uppercase leading-none font-heading"
-        viewBox="0 0 1440 120"
-        preserveAspectRatio="xMidYMid slice"
+        // Aspect matches the short viewBox so the band fills width with no
+        // letterboxing and no clipping — a slim strip on every screen.
+        className="select-none w-full overflow-visible block aspect-[1440/84] text-[2.75rem] md:text-[3rem] font-bold uppercase leading-none font-heading"
+        viewBox="0 0 1440 84"
       >
         <text ref={measureRef} xmlSpace="preserve" style={{ visibility: 'hidden', opacity: 0, pointerEvents: 'none' }}>
           {text}
