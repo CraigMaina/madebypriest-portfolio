@@ -81,14 +81,14 @@ const WorkSection = ({ setReferralProject }) => {
   };
 
   return (
-    <div id="work" className="min-h-screen p-8 md:p-16 bg-black">
-      <h2 className="text-5xl md:text-7xl font-bold mb-12 text-white">
+    <div id="work" className="bg-ink-900 px-5 md:px-8 py-16 md:py-24 lg:py-32">
+      <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold mb-10 md:mb-12 text-fog-100">
         Selected Works
       </h2>
 
       {/* --- Project Grid --- */}
       {/* This grid stacks on mobile (grid-cols-1) and expands on larger screens */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
         {projects.map((project) => (
           <ProjectCard
             key={project.title}
@@ -110,7 +110,7 @@ const WorkSection = ({ setReferralProject }) => {
 // --- 3. ProjectCard Sub-Component ---
 const ProjectCard = ({ project, onPreviewClick, onBookCall }) => {
   return (
-    <div className="bg-gray-950 rounded-lg overflow-hidden group">
+    <div className="bg-ink-800 rounded-card shadow-card overflow-hidden group border border-ink-700">
       {/* Thumbnail */}
       <div className="relative w-full h-48">
         <img
@@ -120,10 +120,10 @@ const ProjectCard = ({ project, onPreviewClick, onBookCall }) => {
           onError={(e) => { e.target.src = FALLBACK_THUMB; }}
         />
         {/* Play icon overlay */}
-        <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute inset-0 bg-ink-900/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onPreviewClick(project)}
-            className="text-white text-5xl"
+            className="text-fog-100 text-5xl hover:text-accent transition-colors"
             aria-label={`Preview ${project.title}`}
           >
             ▶
@@ -132,16 +132,16 @@ const ProjectCard = ({ project, onPreviewClick, onBookCall }) => {
       </div>
 
       {/* Card Content */}
-      <div className="p-4 text-white">
-        <h3 className="text-xl font-semibold">{project.title}</h3>
-        <p className="text-gray-400 text-sm">{project.category}</p>
+      <div className="p-4 text-fog-100">
+        <h3 className="text-lg md:text-xl font-semibold">{project.title}</h3>
+        <p className="text-fog-500 text-sm">{project.category}</p>
 
         {/* Button Container */}
         <div className="flex gap-2 mt-4">
-          {/* Preview Button */}
+          {/* Preview Button (secondary / ghost) */}
           <button
             onClick={() => onPreviewClick(project)}
-            className="flex-1 px-4 py-2 text-sm bg-gray-800 rounded-md hover:bg-gray-700 transition-colors"
+            className="flex-1 min-h-[44px] px-4 py-3 text-sm bg-ink-700 text-fog-100 rounded-lg hover:bg-ink-600 transition duration-300 ease-out"
           >
             Preview
           </button>
@@ -150,7 +150,7 @@ const ProjectCard = ({ project, onPreviewClick, onBookCall }) => {
           <a
             href="#contact"
             onClick={() => onBookCall?.(project.title)}
-            className="flex-1 px-4 py-2 text-sm text-center bg-white text-black font-medium rounded-md hover:scale-105 transition-transform"
+            className="flex-1 min-h-[44px] flex items-center justify-center px-4 py-3 text-sm text-center bg-fog-100 text-ink-900 font-medium rounded-lg hover:bg-white transition duration-300 ease-out"
           >
             Book a Call
           </a>
@@ -169,12 +169,12 @@ const VideoModal = ({ project, onClose }) => {
 
   return (
     // Full-screen overlay
-    <div className="fixed inset-0 bg-black/80 z-[999] flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-ink-900/90 z-[999] flex items-center justify-center p-4">
 
       {/* Close button (top right) */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 text-white text-3xl z-[1001]"
+        className="absolute top-4 right-4 text-fog-100 hover:text-accent text-3xl z-[1001]"
         aria-label="Close preview"
       >
         <GoX />
@@ -189,16 +189,16 @@ const VideoModal = ({ project, onClose }) => {
         />
 
         {/* Aspect ratio container for the video */}
-        <div className="relative w-full aspect-video z-[1000] overflow-hidden rounded-lg bg-black">
+        <div className="relative w-full aspect-video z-[1000] overflow-hidden rounded-card bg-black">
           {videoFailed ? (
             <div
               className="w-full h-full flex flex-col items-center justify-center bg-center bg-cover"
               style={{ backgroundImage: `url(${project.thumbnail})` }}
             >
-              <div className="absolute inset-0 bg-black/70" />
+              <div className="absolute inset-0 bg-ink-900/75" />
               <div className="relative text-center px-6">
-                <h3 className="text-2xl md:text-3xl font-bold text-white">{project.title}</h3>
-                <p className="mt-2 text-gray-300">Full reel coming soon.</p>
+                <h3 className="text-2xl md:text-3xl font-bold text-fog-100">{project.title}</h3>
+                <p className="mt-2 text-fog-300">Full reel coming soon.</p>
               </div>
             </div>
           ) : (

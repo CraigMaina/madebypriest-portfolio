@@ -31,28 +31,28 @@ const sliders = [
 
 const BeforeAfterSlider = () => {
   return (
-    <div id="craft" className="py-16 md:py-24 bg-gray-950 text-white">
-      <div className="max-w-6xl mx-auto px-8">
-        
+    <div id="craft" className="py-16 md:py-24 lg:py-32 bg-ink-900 text-fog-100">
+      <div className="max-w-6xl mx-auto px-5 md:px-8">
+
         {/* --- Section Header --- */}
-        <div className="text-center mb-12">
-          <h2 className="text-5xl md:text-7xl font-bold">
+        <div className="text-center mb-10 md:mb-12">
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold">
             The Craft
           </h2>
-          <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-fog-300 mt-4 max-w-2xl mx-auto leading-relaxed">
             It's not just about the shot, it's about the final grade.
             Slide to see the transformation.
           </p>
         </div>
 
         {/* --- Slider Grid --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {sliders.map((slider) => (
             <div key={slider.title}>
-              <h3 className="text-2xl font-semibold mb-4 text-center">
+              <h3 className="text-lg md:text-xl font-semibold mb-4 text-center">
                 {slider.title}
               </h3>
-              <div className="rounded-lg overflow-hidden shadow-lg border border-gray-700">
+              <div className="rounded-card overflow-hidden shadow-card border border-ink-600">
                 
                 {/* 2. Use the new component syntax */}
                 <ImgComparisonSlider>

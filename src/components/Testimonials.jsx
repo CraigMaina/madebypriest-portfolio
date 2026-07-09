@@ -29,8 +29,8 @@ const allTestimonials = [...testimonials, ...testimonials];
 
 const Testimonials = () => {
   return (
-    <div id="trusted" className="py-16 md:py-24 bg-black overflow-hidden">
-      <h2 className="text-center text-2xl text-gray-400 mb-12">
+    <div id="trusted" className="py-16 md:py-24 lg:py-32 bg-ink-900 overflow-hidden">
+      <h2 className="text-center text-xl md:text-2xl text-fog-500 mb-10 md:mb-12">
         Trusted By Brands & Artists
       </h2>
       
@@ -40,14 +40,14 @@ const Testimonials = () => {
         <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-scroll-x">
           {allTestimonials.map((item, index) => (
             <li key={index} className="flex-shrink-0 w-80 md:w-96">
-              <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
-                <p className="text-lg text-gray-300 italic">
+              <div className="bg-ink-800 p-6 rounded-card shadow-card border border-ink-700 h-full">
+                <p className="text-base md:text-lg text-fog-300 italic leading-relaxed">
                   "{item.quote}"
                 </p>
-                <p className="text-white font-semibold mt-4">
+                <p className="text-fog-100 font-semibold mt-4">
                   {item.name}
                 </p>
-                <p className="text-gray-400 text-sm">
+                <p className="text-fog-500 text-sm">
                   {item.project}
                 </p>
               </div>
@@ -58,14 +58,14 @@ const Testimonials = () => {
         <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-scroll-x" aria-hidden="true">
           {allTestimonials.map((item, index) => (
             <li key={index} className="flex-shrink-0 w-80 md:w-96">
-              <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
-                <p className="text-lg text-gray-300 italic">
+              <div className="bg-ink-800 p-6 rounded-card shadow-card border border-ink-700 h-full">
+                <p className="text-base md:text-lg text-fog-300 italic leading-relaxed">
                   "{item.quote}"
                 </p>
-                <p className="text-white font-semibold mt-4">
+                <p className="text-fog-100 font-semibold mt-4">
                   {item.name}
                 </p>
-                <p className="text-gray-400 text-sm">
+                <p className="text-fog-500 text-sm">
                   {item.project}
                 </p>
               </div>
