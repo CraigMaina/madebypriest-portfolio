@@ -1,184 +1,127 @@
 import { useState, useEffect, useRef } from 'react';
-import { GoX } from 'react-icons/go'; // Using icons for the buttons
+import { GoX } from 'react-icons/go';
+import { FaPlay } from 'react-icons/fa';
 
 // --- 1. Project Data ---
+// CMS-ready shape (mirrors the future Sanity `project` schema): title, category,
+// type (Reel/Film/...), orientation (portrait/landscape/square), thumbnail, videoUrl.
 // Thumbnails live in /public/images/. Reels (optional) go in /public/videos/;
 // until a reel exists the preview modal shows the thumbnail + "coming soon".
-// Intentional local fallback if a thumbnail itself is missing (no external calls).
 const FALLBACK_THUMB =
   'data:image/svg+xml;utf8,' +
   encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="#111113"/><text x="50%" y="50%" fill="#8A8A90" font-family="sans-serif" font-size="20" text-anchor="middle" dominant-baseline="middle">Made by Priest</text></svg>`
+    `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800"><rect width="600" height="800" fill="#111113"/><text x="50%" y="50%" fill="#8A8A90" font-family="sans-serif" font-size="24" text-anchor="middle" dominant-baseline="middle">Made by Priest</text></svg>`
   );
 
 const projects = [
-  {
-    title: 'Cosmic Bloom',
-    thumbnail: '/images/thumb_cosmic_bloom.jpg',
-    videoUrl: '/videos/cosmic_bloom.webm',
-    category: 'Generative Art',
-  },
-  {
-    title: 'Speed Meteor',
-    thumbnail: '/images/thumb_speed_meteor.jpg',
-    videoUrl: '/videos/speed_meteor.webm',
-    category: 'VFX',
-  },
-  {
-    title: 'Plasma',
-    thumbnail: '/images/thumb_plasma.jpg',
-    videoUrl: '/videos/plasma.webm',
-    category: 'Music Video',
-  },
-  {
-    title: 'Fire',
-    thumbnail: '/images/thumb_fire.jpg',
-    videoUrl: '/videos/fire.webm',
-    category: 'Commercial',
-  },
-  {
-    title: 'Grid Wave',
-    thumbnail: '/images/thumb_grid_wave.jpg',
-    videoUrl: '/videos/grid_wave.webm',
-    category: 'VFX',
-  },
-  {
-    title: 'Chromatic',
-    thumbnail: '/images/thumb_chromatic.jpg',
-    videoUrl: '/videos/chromatic.webm',
-    category: 'Generative Art',
-  },
-  {
-    title: 'Smoke',
-    thumbnail: '/images/thumb_smoke.jpg',
-    videoUrl: '/videos/smoke.webm',
-    category: 'Commercial',
-  },
-  {
-    title: 'Aura',
-    thumbnail: '/images/thumb_aura.jpg',
-    videoUrl: '/videos/aura.webm',
-    category: 'Music Video',
-  },
+  { title: 'Plasma', category: 'Music Video', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_plasma.jpg', videoUrl: '/videos/plasma.webm' },
+  { title: 'Cosmic Bloom', category: 'Generative Art', type: 'Film', orientation: 'landscape', thumbnail: '/images/thumb_cosmic_bloom.jpg', videoUrl: '/videos/cosmic_bloom.webm' },
+  { title: 'Grid Wave', category: 'Social Ad', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_grid_wave.jpg', videoUrl: '/videos/grid_wave.webm' },
+  { title: 'Fire', category: 'Commercial', type: 'Film', orientation: 'landscape', thumbnail: '/images/thumb_fire.jpg', videoUrl: '/videos/fire.webm' },
+  { title: 'Chromatic', category: 'Reel', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_chromatic.jpg', videoUrl: '/videos/chromatic.webm' },
+  { title: 'Speed Meteor', category: 'VFX', type: 'Film', orientation: 'landscape', thumbnail: '/images/thumb_speed_meteor.jpg', videoUrl: '/videos/speed_meteor.webm' },
+  { title: 'Aura', category: 'Music Video', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_aura.jpg', videoUrl: '/videos/aura.webm' },
+  { title: 'Smoke', category: 'Brand Story', type: 'Film', orientation: 'landscape', thumbnail: '/images/thumb_smoke.jpg', videoUrl: '/videos/smoke.webm' },
 ];
 
-// --- 2. The Main WorkSection Component ---
+const aspectClass = (orientation) =>
+  orientation === 'portrait' ? 'aspect-[9/16]' : orientation === 'square' ? 'aspect-square' : 'aspect-video';
+
+// --- 2. Main Section ---
 const WorkSection = ({ setReferralProject }) => {
   const [selectedProject, setSelectedProject] = useState(null);
-  const isModalOpen = Boolean(selectedProject);
 
-  const openModal = (project) => {
-    setSelectedProject(project);
-  };
+  const openModal = (project) => setSelectedProject(project);
+  const closeModal = () => setSelectedProject(null);
 
-  const closeModal = () => {
-    setSelectedProject(null);
-  };
-
-  // Personalize the contact form with the project the visitor came from.
-  const handleBookCall = (title) => {
+  // Preserve the referral personalization: starting a project from a reel
+  // stamps its title into the contact form, then jumps to the form.
+  const startProject = (title) => {
     setReferralProject?.(title);
+    setSelectedProject(null);
+    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <div id="work" className="bg-ink-900 px-5 md:px-8 py-16 md:py-24 lg:py-32">
-      <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold mb-10 md:mb-12 text-fog-100">
-        Selected Works
-      </h2>
+    <section id="work" className="bg-ink-900 px-5 md:px-8 py-16 md:py-24 lg:py-32">
+      <div className="max-w-6xl mx-auto">
+        <header className="mb-10 md:mb-14">
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold text-fog-100">
+            Selected Works
+          </h2>
+          <p className="mt-3 text-base md:text-lg text-fog-300 max-w-2xl">
+            Vertical reels that stop the scroll, landscape films that hold the room.
+          </p>
+        </header>
 
-      {/* --- Project Grid --- */}
-      {/* This grid stacks on mobile (grid-cols-1) and expands on larger screens */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-        {projects.map((project) => (
-          <ProjectCard
-            key={project.title}
-            project={project}
-            onPreviewClick={openModal}
-            onBookCall={handleBookCall}
-          />
-        ))}
+        {/* Masonry: portrait and landscape tiles interleave naturally via CSS columns. */}
+        <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 md:gap-6">
+          {projects.map((project) => (
+            <ProjectCard key={project.title} project={project} onOpen={openModal} />
+          ))}
+        </div>
       </div>
 
-      {/* --- Video Modal --- */}
-      {isModalOpen && (
-        <VideoModal project={selectedProject} onClose={closeModal} />
+      {selectedProject && (
+        <VideoModal project={selectedProject} onClose={closeModal} onStartProject={startProject} />
       )}
-    </div>
+    </section>
   );
 };
 
-// --- 3. ProjectCard Sub-Component ---
-const ProjectCard = ({ project, onPreviewClick, onBookCall }) => {
+// --- 3. ProjectCard ---
+const ProjectCard = ({ project, onOpen }) => {
   return (
-    <div className="bg-ink-800 rounded-card shadow-card overflow-hidden group border border-ink-700">
-      {/* Thumbnail */}
-      <div className="relative w-full h-48">
+    <button
+      type="button"
+      onClick={() => onOpen(project)}
+      aria-label={`Preview ${project.title} — ${project.category}`}
+      className="group relative block w-full mb-5 md:mb-6 break-inside-avoid overflow-hidden rounded-card border border-ink-700 bg-ink-800 text-left"
+    >
+      <div className={`relative w-full ${aspectClass(project.orientation)}`}>
         <img
           src={project.thumbnail}
-          alt={`${project.title} — ${project.category} project thumbnail`}
-          width="600"
-          height="400"
+          alt={`${project.title} — ${project.category}`}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           onError={(e) => { e.target.src = FALLBACK_THUMB; }}
         />
-        {/* Play icon overlay */}
-        <div className="absolute inset-0 bg-ink-900/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={() => onPreviewClick(project)}
-            className="text-fog-100 text-5xl hover:text-accent transition-colors"
-            aria-label={`Preview ${project.title}`}
-          >
-            ▶
-          </button>
+
+        {/* Type badge */}
+        <span className="absolute top-3 left-3 z-10 text-[11px] font-semibold uppercase tracking-wider bg-ink-900/70 text-fog-100 px-2.5 py-1 rounded-full backdrop-blur-sm">
+          {project.type}
+        </span>
+
+        {/* Play affordance */}
+        <div className="absolute inset-0 flex items-center justify-center bg-ink-900/20 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-300">
+          <span className="flex items-center justify-center w-14 h-14 rounded-full bg-accent text-ink-900 shadow-card transition-transform duration-300 group-hover:scale-110">
+            <FaPlay className="ml-0.5" aria-hidden="true" />
+          </span>
+        </div>
+
+        {/* Title / category */}
+        <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-ink-900 via-ink-900/60 to-transparent">
+          <h3 className="text-base md:text-lg font-semibold text-fog-100">{project.title}</h3>
+          <p className="text-xs md:text-sm text-fog-300">{project.category}</p>
         </div>
       </div>
-
-      {/* Card Content */}
-      <div className="p-4 text-fog-100">
-        <h3 className="text-lg md:text-xl font-semibold">{project.title}</h3>
-        <p className="text-fog-500 text-sm">{project.category}</p>
-
-        {/* Button Container */}
-        <div className="flex gap-2 mt-4">
-          {/* Preview Button (secondary / ghost) */}
-          <button
-            onClick={() => onPreviewClick(project)}
-            className="flex-1 min-h-[44px] px-4 py-3 text-sm bg-ink-700 text-fog-100 rounded-lg hover:bg-ink-600 transition duration-300 ease-out"
-          >
-            Preview
-          </button>
-
-          {/* CTA Button — carries the project title into the contact form */}
-          <a
-            href="#contact"
-            onClick={() => onBookCall?.(project.title)}
-            className="flex-1 min-h-[44px] flex items-center justify-center px-4 py-3 text-sm text-center bg-fog-100 text-ink-900 font-medium rounded-lg hover:bg-white transition duration-300 ease-out"
-          >
-            Start a Project
-          </a>
-        </div>
-      </div>
-    </div>
+    </button>
   );
 };
 
-// --- 4. VideoModal Sub-Component ---
-const VideoModal = ({ project, onClose }) => {
-  // Reels are supplied later; until the file exists the <video> 404s. Rather
-  // than a dead black player we fall back to the thumbnail poster + a clear
-  // "coming soon" state. When a real /videos/ file lands, it just plays.
+// --- 4. VideoModal ---
+const VideoModal = ({ project, onClose, onStartProject }) => {
   const [videoFailed, setVideoFailed] = useState(false);
   const dialogRef = useRef(null);
   const closeBtnRef = useRef(null);
 
+  const isPortrait = project.orientation === 'portrait';
+
   useEffect(() => {
-    // Remember what was focused so we can restore it on close.
     const previouslyFocused = document.activeElement;
     closeBtnRef.current?.focus();
 
-    // Lock background scroll while the modal is open.
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
@@ -187,7 +130,6 @@ const VideoModal = ({ project, onClose }) => {
         onClose();
         return;
       }
-      // Simple focus trap: keep Tab focus inside the dialog.
       if (e.key === 'Tab') {
         const focusable = dialogRef.current?.querySelectorAll(
           'button, [href], video, [tabindex]:not([tabindex="-1"])'
@@ -214,7 +156,6 @@ const VideoModal = ({ project, onClose }) => {
   }, [onClose]);
 
   return (
-    // Full-screen overlay
     <div
       ref={dialogRef}
       role="dialog"
@@ -222,8 +163,6 @@ const VideoModal = ({ project, onClose }) => {
       aria-label={`${project.title} preview`}
       className="fixed inset-0 bg-ink-900/90 z-[999] flex items-center justify-center p-4"
     >
-
-      {/* Close button (top right) */}
       <button
         ref={closeBtnRef}
         onClick={onClose}
@@ -233,16 +172,11 @@ const VideoModal = ({ project, onClose }) => {
         <GoX />
       </button>
 
-      {/* Video Player */}
-      <div className="relative w-full max-w-4xl">
+      <div className={`relative z-[1000] w-full ${isPortrait ? 'max-w-sm' : 'max-w-4xl'}`}>
         {/* Click-away backdrop */}
-        <div
-          className="absolute inset-0 -m-4"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 -z-10" onClick={onClose} aria-hidden="true" />
 
-        {/* Aspect ratio container for the video */}
-        <div className="relative w-full aspect-video z-[1000] overflow-hidden rounded-card bg-black">
+        <div className={`relative w-full ${aspectClass(project.orientation)} max-h-[72vh] mx-auto overflow-hidden rounded-card bg-black`}>
           {videoFailed ? (
             <div
               className="w-full h-full flex flex-col items-center justify-center bg-center bg-cover"
@@ -268,6 +202,20 @@ const VideoModal = ({ project, onClose }) => {
               Your browser does not support the video tag.
             </video>
           )}
+        </div>
+
+        {/* In-modal conversion — carries the project title into the contact form */}
+        <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3 text-center">
+          <p className="text-fog-300">
+            <span className="text-fog-100 font-semibold">{project.title}</span> · {project.category}
+          </p>
+          <button
+            type="button"
+            onClick={() => onStartProject(project.title)}
+            className="px-6 py-3 bg-accent text-ink-900 font-bold rounded-full hover:bg-accent-hover transition-colors"
+          >
+            Start a project like this
+          </button>
         </div>
       </div>
     </div>
