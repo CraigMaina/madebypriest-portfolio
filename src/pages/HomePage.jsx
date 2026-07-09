@@ -7,6 +7,7 @@ import CurvedLoop from '../components/CurvedLoop';
 import WorkSection from '../components/WorkSection';
 import BeforeAfterSlider from '../components/BeforeAfterSlider';
 import Testimonials from '../components/Testimonials';
+import JournalPreview from '../components/JournalPreview';
 import ContactForm from '../components/ContactForm';
 import Preloader from '../components/Preloader';
 import SEO from '../components/SEO';
@@ -152,6 +153,7 @@ function HomePage() {
         <WorkSection setReferralProject={setReferralProject} />
         <BeforeAfterSlider />
         <Testimonials />
+        <JournalPreview />
         <ContactForm referralProject={referralProject} />
       </div>
     </>
