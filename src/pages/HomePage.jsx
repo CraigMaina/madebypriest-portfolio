@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import CardNav from '../components/CardNav';
+import { useBooking } from '../components/BookingProvider';
 import HeroBackground from '../components/HeroBackground';
 import CurvedLoop from '../components/CurvedLoop';
 import WorkSection from '../components/WorkSection';
@@ -14,11 +15,11 @@ import SEO from '../components/SEO';
 // fog-100). They live here because CardNav applies them as inline styles.
 const navItems = [
   {
-    label: 'Films',
+    label: 'Work',
     bgColor: '#1A1A1D', // ink-700
     textColor: '#F5F5F7', // fog-100
     links: [
-      { label: 'Main Portfolio', href: '#work', ariaLabel: 'See Main Portfolio' },
+      { label: 'Selected Work', href: '#work', ariaLabel: 'See selected work' },
       { label: 'The Craft', href: '#craft', ariaLabel: 'See The Craft' },
     ],
   },
@@ -43,6 +44,7 @@ const navItems = [
 ];
 
 function HomePage() {
+  const { hasBooking, openBooking } = useBooking();
   const [referralProject, setReferralProject] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSiteVisible, setIsSiteVisible] = useState(false);
@@ -117,12 +119,22 @@ function HomePage() {
               Cinematic editing that turns brands into icons and viewers into fans.
             </p>
 
-            <a
-              href="#contact"
-              className="inline-block mt-8 px-8 py-4 bg-accent text-ink-900 font-bold rounded-full hover:bg-accent-hover hover:scale-105 transition duration-300 ease-out tracking-wide"
-            >
-              Start a Project
-            </a>
+            {hasBooking ? (
+              <button
+                type="button"
+                onClick={openBooking}
+                className="inline-block mt-8 px-8 py-4 bg-accent text-ink-900 font-bold rounded-full hover:bg-accent-hover hover:scale-105 transition duration-300 ease-out tracking-wide"
+              >
+                Start a Project
+              </button>
+            ) : (
+              <a
+                href="#contact"
+                className="inline-block mt-8 px-8 py-4 bg-accent text-ink-900 font-bold rounded-full hover:bg-accent-hover hover:scale-105 transition duration-300 ease-out tracking-wide"
+              >
+                Start a Project
+              </a>
+            )}
           </div>
         </div>
 
