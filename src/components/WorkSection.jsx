@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { GoArrowRight, GoX } from 'react-icons/go'; // Using icons for the buttons
+import { useState, useEffect, useRef } from 'react';
+import { GoX } from 'react-icons/go'; // Using icons for the buttons
 
 // --- 1. Project Data ---
 // Thumbnails live in /public/images/. Reels (optional) go in /public/videos/;
@@ -170,13 +170,62 @@ const VideoModal = ({ project, onClose }) => {
   // than a dead black player we fall back to the thumbnail poster + a clear
   // "coming soon" state. When a real /videos/ file lands, it just plays.
   const [videoFailed, setVideoFailed] = useState(false);
+  const dialogRef = useRef(null);
+  const closeBtnRef = useRef(null);
+
+  useEffect(() => {
+    // Remember what was focused so we can restore it on close.
+    const previouslyFocused = document.activeElement;
+    closeBtnRef.current?.focus();
+
+    // Lock background scroll while the modal is open.
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      // Simple focus trap: keep Tab focus inside the dialog.
+      if (e.key === 'Tab') {
+        const focusable = dialogRef.current?.querySelectorAll(
+          'button, [href], video, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusable || focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = prevOverflow;
+      previouslyFocused?.focus?.();
+    };
+  }, [onClose]);
 
   return (
     // Full-screen overlay
-    <div className="fixed inset-0 bg-ink-900/90 z-[999] flex items-center justify-center p-4">
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${project.title} preview`}
+      className="fixed inset-0 bg-ink-900/90 z-[999] flex items-center justify-center p-4"
+    >
 
       {/* Close button (top right) */}
       <button
+        ref={closeBtnRef}
         onClick={onClose}
         className="absolute top-4 right-4 text-fog-100 hover:text-accent text-3xl z-[1001]"
         aria-label="Close preview"
