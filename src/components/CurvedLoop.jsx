@@ -102,7 +102,7 @@ const CurvedLoop = ({
 
   return (
     <div
-      className="w-full flex items-center justify-center overflow-hidden py-6 bg-ink-900 relative z-10"
+      className="w-full flex items-center justify-center overflow-hidden py-2 md:py-3 bg-ink-900 relative z-10"
       style={{ visibility: ready ? 'visible' : 'hidden', cursor: cursorStyle }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -110,9 +110,11 @@ const CurvedLoop = ({
       onPointerLeave={endDrag}
     >
       <svg
-        // CHANGED: Reduced desktop text size to md:text-[5rem] (was 7rem)
-        className="select-none w-full overflow-visible block aspect-[100/12] text-[5rem] md:text-[5rem] font-bold uppercase leading-none font-heading"
+        // Band height scales with width; cap it on larger screens (was ~17% of
+        // viewport width) and crop cleanly so it doesn't dominate on desktop.
+        className="select-none w-full overflow-hidden block aspect-[100/12] md:max-h-[104px] lg:max-h-[92px] text-[5rem] md:text-[4rem] font-bold uppercase leading-none font-heading"
         viewBox="0 0 1440 120"
+        preserveAspectRatio="xMidYMid slice"
       >
         <text ref={measureRef} xmlSpace="preserve" style={{ visibility: 'hidden', opacity: 0, pointerEvents: 'none' }}>
           {text}
