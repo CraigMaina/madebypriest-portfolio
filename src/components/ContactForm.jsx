@@ -1,4 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+
+// Dark cinematic poster shown before the background video loads (and as the
+// permanent backdrop under prefers-reduced-motion). Self-contained, no request.
+const VIDEO_POSTER =
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="9"><defs><radialGradient id="g" cx="50%" cy="0%" r="120%"><stop offset="0" stop-color="#26262B"/><stop offset="0.6" stop-color="#0A0A0B"/></radialGradient></defs><rect width="16" height="9" fill="url(#g)"/></svg>`
+  );
 
 // Formspree endpoint is configured via env (see .env.example). Never hard-code
 // the real ID. If it is unset the form fails gracefully with a clear message
@@ -17,6 +25,36 @@ const PROFILE_FALLBACK =
 const ContactForm = ({ referralProject }) => {
   const [status, setStatus] = useState('idle'); // idle | submitting | success | error
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Only load/decode the full-screen background video on capable, motion-tolerant
+  // devices, and only once the section is near the viewport (IntersectionObserver).
+  const sectionRef = useRef(null);
+  const [loadVideo, setLoadVideo] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const rm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (rm) {
+      setReducedMotion(true);
+      return; // never fetch the video
+    }
+    const el = sectionRef.current;
+    if (!el || !('IntersectionObserver' in window)) {
+      setLoadVideo(true);
+      return;
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setLoadVideo(true);
+          obs.disconnect();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,19 +93,28 @@ const ContactForm = ({ referralProject }) => {
   const isSubmitting = status === 'submitting';
 
   return (
-    <div id="contact" className="relative w-full min-h-screen overflow-hidden flex items-center justify-center p-8 md:p-16">
+    <div ref={sectionRef} id="contact" className="relative w-full min-h-screen overflow-hidden flex items-center justify-center p-8 md:p-16">
 
-      {/* --- 1. Video Background --- */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0"
-      >
-        <source src="/contact-bg.webm" type="video/webm" />
-        Your browser does not support the video tag.
-      </video>
+      {/* --- 1. Video Background (lazy; static poster under reduced-motion) --- */}
+      {reducedMotion ? (
+        <div
+          className="absolute inset-0 w-full h-full bg-cover bg-center z-0"
+          style={{ backgroundImage: `url("${VIDEO_POSTER}")` }}
+        />
+      ) : (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="none"
+          poster={VIDEO_POSTER}
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        >
+          {loadVideo && <source src="/contact-bg.webm" type="video/webm" />}
+          Your browser does not support the video tag.
+        </video>
+      )}
 
       {/* --- 2. Dark Overlay --- */}
       <div className="absolute inset-0 bg-ink-900/80 z-10" />
@@ -81,6 +128,8 @@ const ContactForm = ({ referralProject }) => {
             alt="Portrait of Priest, cinematic video editor"
             width="128"
             height="128"
+            loading="lazy"
+            decoding="async"
             className="w-32 h-32 rounded-full object-cover border-2 border-white/20 mb-4"
             onError={(e) => { e.target.src = PROFILE_FALLBACK; }}
           />
