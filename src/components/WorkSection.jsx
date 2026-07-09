@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { GoX } from 'react-icons/go';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { GoX, GoArrowUpRight } from 'react-icons/go';
 import { FaPlay } from 'react-icons/fa';
 import { useContent } from '../sanity/content';
 import { FALLBACK_THUMB } from '../data/placeholders';
@@ -7,16 +7,27 @@ import { FALLBACK_THUMB } from '../data/placeholders';
 const aspectClass = (orientation) =>
   orientation === 'portrait' ? 'aspect-[9/16]' : orientation === 'square' ? 'aspect-square' : 'aspect-video';
 
+const FILTERS = [
+  { label: 'All', match: () => true },
+  { label: 'Reels', match: (p) => p.type === 'Reel' },
+  { label: 'Films', match: (p) => p.type === 'Film' },
+];
+
 // --- Main Section ---
 const WorkSection = ({ setReferralProject }) => {
   const projects = useContent('projects');
   const [selectedProject, setSelectedProject] = useState(null);
+  const [filter, setFilter] = useState('All');
+
+  const visible = useMemo(() => {
+    const f = FILTERS.find((x) => x.label === filter) || FILTERS[0];
+    return projects.filter(f.match);
+  }, [projects, filter]);
 
   const openModal = (project) => setSelectedProject(project);
   const closeModal = () => setSelectedProject(null);
 
-  // Preserve the referral personalization: starting a project from a reel
-  // stamps its title into the contact form, then jumps to the form.
+  // Starting a project from a reel stamps its title into the contact form.
   const startProject = (title) => {
     setReferralProject?.(title);
     setSelectedProject(null);
@@ -24,21 +35,54 @@ const WorkSection = ({ setReferralProject }) => {
   };
 
   return (
-    <section id="work" className="bg-ink-900 px-5 md:px-8 py-16 md:py-24 lg:py-32">
-      <div className="max-w-6xl mx-auto">
-        <header className="mb-10 md:mb-14">
-          <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold text-fog-100">
-            Selected Works
-          </h2>
-          <p className="mt-3 text-base md:text-lg text-fog-300 max-w-2xl">
-            Vertical reels that stop the scroll, landscape films that hold the room.
-          </p>
+    <section id="work" className="relative bg-ink-900 px-5 md:px-8 py-16 md:py-24 lg:py-32">
+      {/* Ambient accent glow for depth */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-24 right-0 h-72 w-72 rounded-full bg-accent/10 blur-[120px]"
+      />
+
+      <div className="relative max-w-6xl mx-auto">
+        <header className="mb-8 md:mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-accent text-xs md:text-sm font-semibold uppercase tracking-[0.25em] mb-3">
+              Selected Work
+            </p>
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold text-fog-100">
+              Reels &amp; films that perform
+            </h2>
+            <p className="mt-3 text-base md:text-lg text-fog-300 max-w-xl">
+              Vertical reels that stop the scroll, landscape films that hold the room.
+            </p>
+          </div>
+
+          {/* Filter tabs */}
+          <div className="flex flex-wrap gap-2 shrink-0" role="tablist" aria-label="Filter work">
+            {FILTERS.map((f) => {
+              const active = filter === f.label;
+              return (
+                <button
+                  key={f.label}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setFilter(f.label)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${
+                    active
+                      ? 'bg-accent text-ink-900'
+                      : 'border border-ink-600 text-fog-300 hover:border-fog-500 hover:text-fog-100'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              );
+            })}
+          </div>
         </header>
 
-        {/* Masonry: portrait and landscape tiles interleave naturally via CSS columns. */}
+        {/* Masonry: portrait + landscape interleave via CSS columns */}
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 md:gap-6">
-          {projects.map((project) => (
-            <ProjectCard key={project.title} project={project} onOpen={openModal} />
+          {visible.map((project, i) => (
+            <ProjectCard key={project.title} project={project} index={i} onOpen={openModal} />
           ))}
         </div>
       </div>
@@ -50,14 +94,14 @@ const WorkSection = ({ setReferralProject }) => {
   );
 };
 
-// --- 3. ProjectCard ---
-const ProjectCard = ({ project, onOpen }) => {
+// --- ProjectCard ---
+const ProjectCard = ({ project, index, onOpen }) => {
   return (
     <button
       type="button"
       onClick={() => onOpen(project)}
       aria-label={`Preview ${project.title} — ${project.category}`}
-      className="group relative block w-full mb-5 md:mb-6 break-inside-avoid overflow-hidden rounded-card border border-ink-700 bg-ink-800 text-left"
+      className="group relative block w-full mb-5 md:mb-6 break-inside-avoid overflow-hidden rounded-card border border-ink-700 bg-ink-800 text-left transition duration-500 ease-out hover:-translate-y-1.5 hover:border-accent/60 hover:shadow-[0_24px_50px_-20px_rgba(0,0,0,0.85)]"
     >
       <div className={`relative w-full ${aspectClass(project.orientation)}`}>
         <img
@@ -65,33 +109,46 @@ const ProjectCard = ({ project, onOpen }) => {
           alt={`${project.title} — ${project.category}`}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
           onError={(e) => { e.target.src = FALLBACK_THUMB; }}
         />
 
-        {/* Type badge */}
+        {/* Constant bottom scrim + hover-deepened wash */}
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-900 via-ink-900/25 to-transparent" />
+        <div className="absolute inset-0 bg-accent/0 group-hover:bg-accent/5 transition-colors duration-500" />
+
+        {/* Top row: type badge + index */}
         <span className="absolute top-3 left-3 z-10 text-[11px] font-semibold uppercase tracking-wider bg-ink-900/70 text-fog-100 px-2.5 py-1 rounded-full backdrop-blur-sm">
           {project.type}
         </span>
+        <span className="absolute top-3 right-4 z-10 font-heading font-bold text-sm text-fog-100/70 tabular-nums">
+          {String(index + 1).padStart(2, '0')}
+        </span>
 
         {/* Play affordance */}
-        <div className="absolute inset-0 flex items-center justify-center bg-ink-900/20 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-300">
-          <span className="flex items-center justify-center w-14 h-14 rounded-full bg-accent text-ink-900 shadow-card transition-transform duration-300 group-hover:scale-110">
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+          <span className="flex items-center justify-center w-14 h-14 rounded-full bg-accent text-ink-900 shadow-card">
             <FaPlay className="ml-0.5" aria-hidden="true" />
           </span>
         </div>
 
-        {/* Title / category */}
-        <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-ink-900 via-ink-900/60 to-transparent">
-          <h3 className="text-base md:text-lg font-semibold text-fog-100">{project.title}</h3>
-          <p className="text-xs md:text-sm text-fog-300">{project.category}</p>
+        {/* Title / category + arrow */}
+        <div className="absolute inset-x-0 bottom-0 p-4 flex items-end justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="text-base md:text-lg font-semibold text-fog-100 truncate">{project.title}</h3>
+            <p className="text-xs md:text-sm text-fog-300 truncate">{project.category}</p>
+          </div>
+          <GoArrowUpRight
+            className="shrink-0 text-xl text-fog-100/70 group-hover:text-accent transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            aria-hidden="true"
+          />
         </div>
       </div>
     </button>
   );
 };
 
-// --- 4. VideoModal ---
+// --- VideoModal ---
 const VideoModal = ({ project, onClose, onStartProject }) => {
   const [videoFailed, setVideoFailed] = useState(false);
   const dialogRef = useRef(null);
@@ -142,7 +199,7 @@ const VideoModal = ({ project, onClose, onStartProject }) => {
       role="dialog"
       aria-modal="true"
       aria-label={`${project.title} preview`}
-      className="fixed inset-0 bg-ink-900/90 z-[999] flex items-center justify-center p-4"
+      className="fixed inset-0 bg-ink-900/90 backdrop-blur-sm z-[999] flex items-center justify-center p-4"
     >
       <button
         ref={closeBtnRef}
@@ -154,10 +211,9 @@ const VideoModal = ({ project, onClose, onStartProject }) => {
       </button>
 
       <div className={`relative z-[1000] w-full ${isPortrait ? 'max-w-sm' : 'max-w-4xl'}`}>
-        {/* Click-away backdrop */}
         <div className="fixed inset-0 -z-10" onClick={onClose} aria-hidden="true" />
 
-        <div className={`relative w-full ${aspectClass(project.orientation)} max-h-[72vh] mx-auto overflow-hidden rounded-card bg-black`}>
+        <div className={`relative w-full ${aspectClass(project.orientation)} max-h-[72vh] mx-auto overflow-hidden rounded-card bg-black border border-ink-700`}>
           {videoFailed ? (
             <div
               className="w-full h-full flex flex-col items-center justify-center bg-center bg-cover"
@@ -185,7 +241,6 @@ const VideoModal = ({ project, onClose, onStartProject }) => {
           )}
         </div>
 
-        {/* In-modal conversion — carries the project title into the contact form */}
         <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3 text-center">
           <p className="text-fog-300">
             <span className="text-fog-100 font-semibold">{project.title}</span> · {project.category}
