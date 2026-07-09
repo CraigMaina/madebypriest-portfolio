@@ -91,11 +91,11 @@ const ContactForm = ({ referralProject }) => {
           </h2>
 
           <p className="text-base md:text-lg text-fog-300 leading-relaxed">
-            "My specialty is cinematic, high-quality editing that makes your brand feel bigger, sharper, and more magnetic. From campaign reels to full-length productions, I shape each frame to tell a story people actually want to watch, and remember."
+            My specialty is cinematic, high-end editing that makes your brand feel bigger, sharper, and more magnetic. From campaign reels to full-length films, I shape every frame to tell a story people actually want to watch — and remember.
           </p>
 
           <p className="text-base md:text-lg text-fog-300 leading-relaxed font-medium border-l-2 border-accent pl-4">
-            "I deliver fast, collaborative, premium editing that feels effortless for you, and unforgettable for your audience."
+            Fast, collaborative, premium editing that feels effortless for you — and unforgettable for your audience.
           </p>
         </div>
 
@@ -135,7 +135,7 @@ const ContactForm = ({ referralProject }) => {
                   type="text"
                   name="name"
                   id="name"
-                  placeholder="Your Name"
+                  placeholder="Your name"
                   required
                   disabled={isSubmitting}
                   className="w-full p-4 bg-transparent border-b border-ink-500 text-fog-100 placeholder-fog-500 focus:border-accent transition-colors disabled:opacity-50"
@@ -148,7 +148,7 @@ const ContactForm = ({ referralProject }) => {
                   type="email"
                   name="email"
                   id="email"
-                  placeholder="Your Email"
+                  placeholder="you@brand.com"
                   required
                   disabled={isSubmitting}
                   className="w-full p-4 bg-transparent border-b border-ink-500 text-fog-100 placeholder-fog-500 focus:border-accent transition-colors disabled:opacity-50"
@@ -161,7 +161,7 @@ const ContactForm = ({ referralProject }) => {
                   name="message"
                   id="message"
                   rows="4"
-                  placeholder={referralProject ? `I saw your work on ${referralProject} and want something similar...` : "Tell me about your vision..."}
+                  placeholder={referralProject ? `I loved your work on ${referralProject} — here's what I have in mind…` : "Tell me about your project…"}
                   required
                   disabled={isSubmitting}
                   className="w-full p-4 bg-transparent border-b border-ink-500 text-fog-100 placeholder-fog-500 focus:border-accent transition-colors disabled:opacity-50"

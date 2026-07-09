@@ -168,7 +168,7 @@ const CardNav = ({
             href="#contact"
             className="card-nav-cta-button hidden md:inline-flex no-underline border-0 rounded-[calc(1rem-0.35rem)] px-4 items-center h-full font-semibold cursor-pointer bg-accent text-ink-900 hover:bg-accent-hover transition-colors duration-300"
           >
-            Book a Call
+            Start a Project
           </a>
         </div>
 

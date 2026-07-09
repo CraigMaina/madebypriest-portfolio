@@ -96,22 +96,19 @@ function App() {
             />
           </div>
           <div className="relative z-10 text-center px-5 md:px-8 max-w-5xl mx-auto">
-            {/* NEW HEADLINE [cite: 12] */}
             <h1 className="text-4xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tighter font-heading leading-tight">
               Videos That Feel Like <span className="text-transparent bg-clip-text bg-gradient-to-r from-fog-100 to-fog-500">Blockbusters.</span>
             </h1>
 
-            {/* NEW SUBHEADLINE [cite: 12] */}
             <p className="text-lg md:text-2xl text-fog-300 mt-6 font-light">
-              Editing That Turns Brands Into Icons.
+              Cinematic editing that turns brands into icons and viewers into fans.
             </p>
 
-            {/* NEW CTA [cite: 14] */}
             <a
               href="#contact"
               className="inline-block mt-8 px-8 py-4 bg-accent text-ink-900 font-bold rounded-full hover:bg-accent-hover hover:scale-105 transition duration-300 ease-out tracking-wide"
             >
-              Let's Make Your Story Unforgettable
+              Start a Project
             </a>
           </div>
         </div>

@@ -40,8 +40,8 @@ const BeforeAfterSlider = () => {
             The Craft
           </h2>
           <p className="text-base md:text-lg text-fog-300 mt-4 max-w-2xl mx-auto leading-relaxed">
-            It's not just about the shot, it's about the final grade.
-            Slide to see the transformation.
+            The shot is only half the story. The grade is where it becomes cinema.
+            Drag to see the difference.
           </p>
         </div>
 

@@ -152,7 +152,7 @@ const ProjectCard = ({ project, onPreviewClick, onBookCall }) => {
             onClick={() => onBookCall?.(project.title)}
             className="flex-1 min-h-[44px] flex items-center justify-center px-4 py-3 text-sm text-center bg-fog-100 text-ink-900 font-medium rounded-lg hover:bg-white transition duration-300 ease-out"
           >
-            Book a Call
+            Start a Project
           </a>
         </div>
       </div>
