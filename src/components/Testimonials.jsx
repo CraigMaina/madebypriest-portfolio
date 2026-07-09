@@ -1,12 +1,5 @@
 import { FaQuoteLeft } from 'react-icons/fa';
-
-// CMS-ready shape (mirrors the future Sanity `testimonial` schema).
-const testimonials = [
-  { name: 'Aura Records', project: 'Music Video', quote: "Priest didn't just film a video, he created a world. The final color grade was beyond anything we expected." },
-  { name: 'Jane & Mike', project: 'Wedding Film', quote: 'We cry every time we watch it. He captured the magic of our day perfectly. Truly a professional.' },
-  { name: 'Nomad Coffee Co.', project: 'Brand Commercial', quote: 'Fast turnaround, incredible eye for detail, and a pleasure to work with. Will be hiring again 100%.' },
-  { name: 'Studio XYZ', project: 'VFX Collaboration', quote: 'A master of his craft. The technical skill and artistic vision are unmatched. Made our project 10x better.' },
-];
+import { useContent } from '../sanity/content';
 
 const initials = (name) =>
   name
@@ -35,10 +28,10 @@ const TestimonialCard = ({ item }) => (
   </div>
 );
 
-// Duplicate for a seamless marquee loop.
-const marqueeItems = [...testimonials, ...testimonials];
-
 const Testimonials = () => {
+  const testimonials = useContent('testimonials');
+  // Duplicate for a seamless marquee loop.
+  const marqueeItems = [...testimonials, ...testimonials];
   return (
     <section id="trusted" className="py-16 md:py-24 lg:py-32 bg-ink-900 overflow-hidden">
       <h2 className="text-center text-xl md:text-2xl text-fog-500 mb-10 md:mb-14">

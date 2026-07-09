@@ -1,34 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { GoX } from 'react-icons/go';
 import { FaPlay } from 'react-icons/fa';
-
-// --- 1. Project Data ---
-// CMS-ready shape (mirrors the future Sanity `project` schema): title, category,
-// type (Reel/Film/...), orientation (portrait/landscape/square), thumbnail, videoUrl.
-// Thumbnails live in /public/images/. Reels (optional) go in /public/videos/;
-// until a reel exists the preview modal shows the thumbnail + "coming soon".
-const FALLBACK_THUMB =
-  'data:image/svg+xml;utf8,' +
-  encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800"><rect width="600" height="800" fill="#111113"/><text x="50%" y="50%" fill="#8A8A90" font-family="sans-serif" font-size="24" text-anchor="middle" dominant-baseline="middle">Made by Priest</text></svg>`
-  );
-
-const projects = [
-  { title: 'Plasma', category: 'Music Video', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_plasma.jpg', videoUrl: '/videos/plasma.webm' },
-  { title: 'Cosmic Bloom', category: 'Generative Art', type: 'Film', orientation: 'landscape', thumbnail: '/images/thumb_cosmic_bloom.jpg', videoUrl: '/videos/cosmic_bloom.webm' },
-  { title: 'Grid Wave', category: 'Social Ad', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_grid_wave.jpg', videoUrl: '/videos/grid_wave.webm' },
-  { title: 'Fire', category: 'Commercial', type: 'Film', orientation: 'landscape', thumbnail: '/images/thumb_fire.jpg', videoUrl: '/videos/fire.webm' },
-  { title: 'Chromatic', category: 'Reel', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_chromatic.jpg', videoUrl: '/videos/chromatic.webm' },
-  { title: 'Speed Meteor', category: 'VFX', type: 'Film', orientation: 'landscape', thumbnail: '/images/thumb_speed_meteor.jpg', videoUrl: '/videos/speed_meteor.webm' },
-  { title: 'Aura', category: 'Music Video', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_aura.jpg', videoUrl: '/videos/aura.webm' },
-  { title: 'Smoke', category: 'Brand Story', type: 'Film', orientation: 'landscape', thumbnail: '/images/thumb_smoke.jpg', videoUrl: '/videos/smoke.webm' },
-];
+import { useContent } from '../sanity/content';
+import { FALLBACK_THUMB } from '../data/placeholders';
 
 const aspectClass = (orientation) =>
   orientation === 'portrait' ? 'aspect-[9/16]' : orientation === 'square' ? 'aspect-square' : 'aspect-video';
 
-// --- 2. Main Section ---
+// --- Main Section ---
 const WorkSection = ({ setReferralProject }) => {
+  const projects = useContent('projects');
   const [selectedProject, setSelectedProject] = useState(null);
 
   const openModal = (project) => setSelectedProject(project);

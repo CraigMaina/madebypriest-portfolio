@@ -1,12 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-
-// Dark cinematic poster shown before the background video loads (and as the
-// permanent backdrop under prefers-reduced-motion). Self-contained, no request.
-const VIDEO_POSTER =
-  'data:image/svg+xml;utf8,' +
-  encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="9"><defs><radialGradient id="g" cx="50%" cy="0%" r="120%"><stop offset="0" stop-color="#26262B"/><stop offset="0.6" stop-color="#0A0A0B"/></radialGradient></defs><rect width="16" height="9" fill="url(#g)"/></svg>`
-  );
+import { VIDEO_POSTER, PROFILE_FALLBACK } from '../data/placeholders';
+import { useBooking } from './BookingProvider';
 
 // Formspree endpoint is configured via env (see .env.example). Never hard-code
 // the real ID. If it is unset the form fails gracefully with a clear message
@@ -14,15 +8,8 @@ const VIDEO_POSTER =
 const FORMSPREE_ID = import.meta.env.VITE_FORMSPREE_ID;
 const FORMSPREE_ENDPOINT = FORMSPREE_ID ? `https://formspree.io/f/${FORMSPREE_ID}` : null;
 
-// Intentional, self-contained profile placeholder (no external network call)
-// until a real /images/profile.jpg is supplied.
-const PROFILE_FALLBACK =
-  'data:image/svg+xml;utf8,' +
-  encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="#1A1A1D"/><text x="50%" y="50%" fill="#E6B450" font-family="sans-serif" font-size="64" font-weight="700" text-anchor="middle" dominant-baseline="middle">MP</text></svg>`
-  );
-
 const ContactForm = ({ referralProject }) => {
+  const { hasBooking, openBooking } = useBooking();
   const [status, setStatus] = useState('idle'); // idle | submitting | success | error
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -146,6 +133,18 @@ const ContactForm = ({ referralProject }) => {
           <p className="text-base md:text-lg text-fog-300 leading-relaxed font-medium border-l-2 border-accent pl-4">
             Fast, collaborative, premium editing that feels effortless for you — and unforgettable for your audience.
           </p>
+
+          {hasBooking && (
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={openBooking}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-accent text-accent font-semibold hover:bg-accent hover:text-ink-900 transition-colors"
+              >
+                Prefer to talk? Book a call
+              </button>
+            </div>
+          )}
         </div>
 
         {/* --- COLUMN 2: Contact Form --- */}

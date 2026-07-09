@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
-// This import was missing from your code, but is required for it to run:
-import { GoArrowUpRight } from 'react-icons/go'; 
+import { GoArrowUpRight } from 'react-icons/go';
+import { useBooking } from './BookingProvider';
 
 const CardNav = ({
   logo,
@@ -10,6 +10,7 @@ const CardNav = ({
   className = '',
   ease = 'power3.out'
 }) => {
+  const { hasBooking, openBooking } = useBooking();
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const navRef = useRef(null);
@@ -172,12 +173,22 @@ const CardNav = ({
             )}
           </div>
 
-          <a
-            href="#contact"
-            className="card-nav-cta-button hidden md:inline-flex no-underline border-0 rounded-[calc(1rem-0.35rem)] px-4 items-center h-full font-semibold cursor-pointer bg-accent text-ink-900 hover:bg-accent-hover transition-colors duration-300"
-          >
-            Start a Project
-          </a>
+          {hasBooking ? (
+            <button
+              type="button"
+              onClick={openBooking}
+              className="card-nav-cta-button hidden md:inline-flex no-underline border-0 rounded-[calc(1rem-0.35rem)] px-4 items-center h-full font-semibold cursor-pointer bg-accent text-ink-900 hover:bg-accent-hover transition-colors duration-300"
+            >
+              Book a Call
+            </button>
+          ) : (
+            <a
+              href="#contact"
+              className="card-nav-cta-button hidden md:inline-flex no-underline border-0 rounded-[calc(1rem-0.35rem)] px-4 items-center h-full font-semibold cursor-pointer bg-accent text-ink-900 hover:bg-accent-hover transition-colors duration-300"
+            >
+              Start a Project
+            </a>
+          )}
         </div>
 
         <div
