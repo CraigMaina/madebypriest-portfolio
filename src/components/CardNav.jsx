@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { GoArrowUpRight } from 'react-icons/go';
 import { useBooking } from './BookingProvider';
@@ -13,7 +13,16 @@ const CardNav = ({
   const { hasBooking, openBooking } = useBooking();
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const navRef = useRef(null);
+
+  // Condense the (now fixed) nav once the user scrolls past the hero fold.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   const cardsRef = useRef([]);
   const tlRef = useRef(null);
 
@@ -131,11 +140,13 @@ const CardNav = ({
 
   return (
     <div
-      className={`card-nav-container absolute left-1/2 -translate-x-1/2 w-[90%] max-w-[800px] z-[99] top-[1.2em] md:top-[2em] ${className}`}
+      className={`card-nav-container fixed left-1/2 -translate-x-1/2 w-[90%] max-w-[800px] z-[99] transition-all duration-300 ease-out ${
+        scrolled ? 'top-[0.6em] md:top-[0.9em]' : 'top-[1.2em] md:top-[2em]'
+      } ${className}`}
     >
       <nav
         ref={navRef}
-        className={`card-nav ${isExpanded ? 'open' : ''} block h-[60px] p-0 rounded-card shadow-card relative overflow-hidden will-change-[height] bg-ink-900 border border-ink-700`}
+        className={`card-nav ${isExpanded ? 'open' : ''} block h-[60px] p-0 rounded-card shadow-card relative overflow-hidden will-change-[height] bg-ink-900/90 backdrop-blur-md border ${scrolled ? 'border-ink-600' : 'border-ink-700'}`}
       >
         <div className="card-nav-top absolute inset-x-0 top-0 h-[60px] flex items-center justify-between p-2 pl-[1.1rem] z-[2]">
           <div
