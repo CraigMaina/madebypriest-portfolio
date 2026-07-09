@@ -116,6 +116,10 @@ const ProjectCard = ({ project, onPreviewClick, onBookCall }) => {
         <img
           src={project.thumbnail}
           alt={`${project.title} — ${project.category} project thumbnail`}
+          width="600"
+          height="400"
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover"
           onError={(e) => { e.target.src = FALLBACK_THUMB; }}
         />

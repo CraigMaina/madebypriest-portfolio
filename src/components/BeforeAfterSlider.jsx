@@ -62,6 +62,8 @@ const BeforeAfterSlider = () => {
                     alt={`${slider.title} — ungraded footage before color grading`}
                     width="800"
                     height="450"
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => { e.target.src = BEFORE_FALLBACK; }}
                   />
                   <img
@@ -70,6 +72,8 @@ const BeforeAfterSlider = () => {
                     alt={`${slider.title} — final cinematic color grade`}
                     width="800"
                     height="450"
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => { e.target.src = AFTER_FALLBACK; }}
                   />
                 </ImgComparisonSlider>
