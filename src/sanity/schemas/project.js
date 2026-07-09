@@ -10,8 +10,9 @@ export default defineType({
     defineField({
       name: 'type',
       type: 'string',
-      options: { list: ['Reel', 'Film', 'Other'], layout: 'radio' },
-      initialValue: 'Film',
+      description: 'Reel = vertical/social, Widescreen = horizontal 16:9.',
+      options: { list: ['Reel', 'Widescreen', 'Other'], layout: 'radio' },
+      initialValue: 'Widescreen',
     }),
     defineField({
       name: 'orientation',
