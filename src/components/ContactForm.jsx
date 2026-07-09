@@ -70,7 +70,7 @@ const ContactForm = ({ referralProject }) => {
       </video>
 
       {/* --- 2. Dark Overlay --- */}
-      <div className="absolute inset-0 bg-black/80 z-10" />
+      <div className="absolute inset-0 bg-ink-900/80 z-10" />
 
       <div className="relative z-20 w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-start">
 
@@ -85,32 +85,32 @@ const ContactForm = ({ referralProject }) => {
             onError={(e) => { e.target.src = PROFILE_FALLBACK; }}
           />
 
-          <h2 className="text-4xl md:text-6xl font-bold font-heading leading-none">
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold font-heading leading-tight">
             Don't just look good.<br/>
-            <span className="text-gray-400">Connect.</span>
+            <span className="text-fog-500">Connect.</span>
           </h2>
 
-          <p className="text-lg text-gray-300 leading-relaxed">
+          <p className="text-base md:text-lg text-fog-300 leading-relaxed">
             "My specialty is cinematic, high-quality editing that makes your brand feel bigger, sharper, and more magnetic. From campaign reels to full-length productions, I shape each frame to tell a story people actually want to watch, and remember."
           </p>
 
-          <p className="text-lg text-gray-300 leading-relaxed font-medium border-l-2 border-lime-400 pl-4">
+          <p className="text-base md:text-lg text-fog-300 leading-relaxed font-medium border-l-2 border-accent pl-4">
             "I deliver fast, collaborative, premium editing that feels effortless for you, and unforgettable for your audience."
           </p>
         </div>
 
         {/* --- COLUMN 2: Contact Form --- */}
-        <div className="w-full bg-white/5 p-8 rounded-3xl backdrop-blur-sm border border-white/10">
+        <div className="w-full bg-white/5 p-8 rounded-card backdrop-blur-sm border border-white/10">
           {status === 'success' ? (
             <div className="text-center py-8" role="status" aria-live="polite">
-              <h3 className="text-2xl font-bold text-white mb-2">Message sent.</h3>
-              <p className="text-gray-300">
+              <h3 className="text-2xl font-bold text-fog-100 mb-2">Message sent.</h3>
+              <p className="text-fog-300">
                 Thanks{referralProject ? ` for the note about ${referralProject}` : ''} — I’ll be in touch within one business day.
               </p>
               <button
                 type="button"
                 onClick={() => setStatus('idle')}
-                className="mt-6 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors"
+                className="mt-6 px-6 py-3 bg-accent text-ink-900 font-bold rounded-full hover:bg-accent-hover transition-colors"
               >
                 Send another
               </button>
@@ -124,7 +124,7 @@ const ContactForm = ({ referralProject }) => {
               />
 
               {referralProject && (
-                <div className="text-lime-400 text-sm font-medium">
+                <div className="text-accent text-sm font-medium">
                   Inquiring about: {referralProject}
                 </div>
               )}
@@ -138,7 +138,7 @@ const ContactForm = ({ referralProject }) => {
                   placeholder="Your Name"
                   required
                   disabled={isSubmitting}
-                  className="w-full p-4 bg-transparent border-b border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:border-white transition-colors disabled:opacity-50"
+                  className="w-full p-4 bg-transparent border-b border-ink-500 text-fog-100 placeholder-fog-500 focus:border-accent transition-colors disabled:opacity-50"
                 />
               </div>
 
@@ -151,7 +151,7 @@ const ContactForm = ({ referralProject }) => {
                   placeholder="Your Email"
                   required
                   disabled={isSubmitting}
-                  className="w-full p-4 bg-transparent border-b border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:border-white transition-colors disabled:opacity-50"
+                  className="w-full p-4 bg-transparent border-b border-ink-500 text-fog-100 placeholder-fog-500 focus:border-accent transition-colors disabled:opacity-50"
                 />
               </div>
 
@@ -164,7 +164,7 @@ const ContactForm = ({ referralProject }) => {
                   placeholder={referralProject ? `I saw your work on ${referralProject} and want something similar...` : "Tell me about your vision..."}
                   required
                   disabled={isSubmitting}
-                  className="w-full p-4 bg-transparent border-b border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:border-white transition-colors disabled:opacity-50"
+                  className="w-full p-4 bg-transparent border-b border-ink-500 text-fog-100 placeholder-fog-500 focus:border-accent transition-colors disabled:opacity-50"
                 />
               </div>
 
@@ -178,7 +178,7 @@ const ContactForm = ({ referralProject }) => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full px-8 py-4 bg-accent text-ink-900 font-bold rounded-full hover:bg-accent-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Sending…' : 'Send Message'}
                 </button>
