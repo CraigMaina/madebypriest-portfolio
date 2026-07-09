@@ -2,14 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  body {
+    margin: 0;
+    background-color: theme('colors.ink.900');
+    color: theme('colors.fog.100');
+    font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+      'Roboto', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Global signature-accent focus ring for every interactive element. */
+  :focus-visible {
+    outline: 2px solid theme('colors.accent.DEFAULT');
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 }
+
 /* Creates the horizontal scrolling animation */
 @keyframes scroll-x {
   from {
@@ -22,4 +33,18 @@ body {
 
 .animate-scroll-x {
   animation: scroll-x 40s linear infinite;
+}
+
+/* Respect reduced-motion: freeze the marquee instead of scrolling. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-scroll-x {
+    animation: none;
+  }
+  * {
+    scroll-behavior: auto !important;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
 }
