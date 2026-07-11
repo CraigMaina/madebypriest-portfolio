@@ -22,7 +22,8 @@ export default defineConfig({
         manualChunks: {
           three: ['three'],
           r3f: ['@react-three/fiber', '@react-three/postprocessing', 'postprocessing'],
-          gsap: ['gsap'],
+          gsap: ['gsap', 'gsap/ScrollTrigger', 'gsap/Flip'],
+          lenis: ['lenis'],
         },
       },
     },

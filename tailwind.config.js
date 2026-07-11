@@ -38,6 +38,17 @@ export default {
         // single elevation token for cards/surfaces
         card: '0 10px 30px -12px rgba(0, 0, 0, 0.7)',
       },
+      // Motion tokens — mirror src/motion/tokens.js so CSS transitions match
+      // the GSAP feel. Entrances use ease-entrance (~expo.out); moves use
+      // ease-move (~power2.inOut).
+      transitionTimingFunction: {
+        entrance: 'cubic-bezier(0.16, 1, 0.3, 1)',
+        move: 'cubic-bezier(0.65, 0, 0.35, 1)',
+      },
+      transitionDuration: {
+        600: '600ms',
+        900: '900ms',
+      },
     },
   },
   plugins: [],
