@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { VIDEO_POSTER, PROFILE_FALLBACK } from '../data/placeholders';
 import { useBooking } from './BookingProvider';
+import { useReveal, useParallax } from '../motion';
 
 // Formspree endpoint is configured via env (see .env.example). Never hard-code
 // the real ID. If it is unset the form fails gracefully with a clear message
@@ -18,6 +19,11 @@ const ContactForm = ({ referralProject }) => {
   const sectionRef = useRef(null);
   const [loadVideo, setLoadVideo] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+
+  // Columns rise in on scroll; the background drifts (overscanned + clipped by
+  // the section's overflow-hidden). Both no-op under reduced-motion.
+  const gridRef = useReveal({ children: ':scope > *', y: 30, start: 'top 75%' });
+  const bgRef = useParallax({ amount: 8 });
 
   useEffect(() => {
     const rm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -83,30 +89,32 @@ const ContactForm = ({ referralProject }) => {
     <div ref={sectionRef} id="contact" className="relative w-full min-h-screen overflow-hidden flex items-center justify-center p-8 md:p-16">
 
       {/* --- 1. Video Background (lazy; static poster under reduced-motion) --- */}
-      {reducedMotion ? (
-        <div
-          className="absolute inset-0 w-full h-full bg-cover bg-center z-0"
-          style={{ backgroundImage: `url("${VIDEO_POSTER}")` }}
-        />
-      ) : (
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="none"
-          poster={VIDEO_POSTER}
-          className="absolute inset-0 w-full h-full object-cover z-0"
-        >
-          {loadVideo && <source src="/contact-bg.webm" type="video/webm" />}
-          Your browser does not support the video tag.
-        </video>
-      )}
+      <div ref={bgRef} className="absolute -top-[12%] -bottom-[12%] inset-x-0 z-0">
+        {reducedMotion ? (
+          <div
+            className="absolute inset-0 w-full h-full bg-cover bg-center"
+            style={{ backgroundImage: `url("${VIDEO_POSTER}")` }}
+          />
+        ) : (
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="none"
+            poster={VIDEO_POSTER}
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            {loadVideo && <source src="/contact-bg.webm" type="video/webm" />}
+            Your browser does not support the video tag.
+          </video>
+        )}
+      </div>
 
       {/* --- 2. Dark Overlay --- */}
       <div className="absolute inset-0 bg-ink-900/80 z-10" />
 
-      <div className="relative z-20 w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-start">
+      <div ref={gridRef} className="relative z-20 w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-start">
 
         {/* --- COLUMN 1: The "About" Copy --- */}
         <div className="text-white space-y-6">

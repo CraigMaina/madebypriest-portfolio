@@ -1,6 +1,11 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { BookingProvider } from './components/BookingProvider';
+import { MotionProvider } from './motion';
+import CustomCursor from './components/CustomCursor';
+import ScrollToTop from './components/ScrollToTop';
+import PageTransition from './components/PageTransition';
+import { PageSkeleton } from './components/Skeleton';
 import HomePage from './pages/HomePage';
 
 // Journal + Studio routes are code-split so the home landing stays lean
@@ -9,41 +14,45 @@ const BlogPage = lazy(() => import('./pages/BlogPage'));
 const BlogPostPage = lazy(() => import('./pages/BlogPostPage'));
 const StudioPage = lazy(() => import('./pages/StudioPage'));
 
-const RouteFallback = () => (
-  <div className="min-h-screen bg-ink-900 text-fog-500 flex items-center justify-center">Loading…</div>
-);
-
 function App() {
   return (
-    <BookingProvider>
-      <Routes>
+    <MotionProvider>
+      <CustomCursor />
+      <ScrollToTop />
+      <BookingProvider>
+        <Routes>
         <Route path="/" element={<HomePage />} />
         <Route
           path="/blog"
           element={
-            <Suspense fallback={<RouteFallback />}>
-              <BlogPage />
+            <Suspense fallback={<PageSkeleton />}>
+              <PageTransition>
+                <BlogPage />
+              </PageTransition>
             </Suspense>
           }
         />
         <Route
           path="/blog/:slug"
           element={
-            <Suspense fallback={<RouteFallback />}>
-              <BlogPostPage />
+            <Suspense fallback={<PageSkeleton />}>
+              <PageTransition>
+                <BlogPostPage />
+              </PageTransition>
             </Suspense>
           }
         />
         <Route
           path="/studio/*"
           element={
-            <Suspense fallback={<RouteFallback />}>
+            <Suspense fallback={<PageSkeleton />}>
               <StudioPage />
             </Suspense>
           }
         />
-      </Routes>
-    </BookingProvider>
+        </Routes>
+      </BookingProvider>
+    </MotionProvider>
   );
 }
 

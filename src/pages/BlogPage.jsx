@@ -31,7 +31,7 @@ function BlogPage() {
             <Link
               key={post.slug}
               to={`/blog/${post.slug}`}
-              className="group block rounded-card overflow-hidden border border-ink-700 bg-ink-800 shadow-card"
+              className="group block rounded-card overflow-hidden border border-ink-700 bg-ink-800 shadow-card transition duration-300 hover:-translate-y-1 hover:border-accent/50 active:scale-[0.98]"
             >
               <div className="aspect-video overflow-hidden">
                 <img

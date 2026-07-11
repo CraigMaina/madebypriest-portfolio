@@ -1,17 +1,20 @@
 import { useRef, useEffect, useState, useMemo, useId } from 'react';
 
-const CurvedLoop = ({
-  marqueeText = '',
-  speed = 5.3,
-  className,
-  curveAmount = 0,
+// One curved marquee row. Auto-scrolls at `speed`, is draggable, and reacts to
+// page scroll velocity (scrollSign lets stacked rows react in opposite ways).
+const MarqueeRow = ({
+  text: rawText,
+  speed = 3,
+  curveAmount = 16,
   direction = 'left',
-  interactive = true
+  scrollSign = 1,
+  interactive = true,
+  className,
 }) => {
   const text = useMemo(() => {
-    const hasTrailing = /\s|\u00A0$/.test(marqueeText);
-    return (hasTrailing ? marqueeText.replace(/\s+$/, '') : marqueeText) + '\u00A0';
-  }, [marqueeText]);
+    const hasTrailing = /\s|\u00A0$/.test(rawText);
+    return (hasTrailing ? rawText.replace(/\s+$/, '') : rawText) + '\u00A0';
+  }, [rawText]);
 
   const measureRef = useRef(null);
   const textPathRef = useRef(null);
@@ -20,14 +23,16 @@ const CurvedLoop = ({
   const [offset, setOffset] = useState(0);
   const uid = useId();
   const pathId = `curve-${uid}`;
-  // Baseline centered in the (shorter) viewBox so the band can be slim without
-  // clipping the glyphs.
-  const pathD = `M-100,56 Q500,${56 + curveAmount} 1540,56`;
+  // Baseline centered in a short viewBox; a gentle quadratic gives the arc
+  // without clipping the glyphs (svg is overflow-visible).
+  const pathD = `M-100,56 Q720,${56 + curveAmount} 1540,56`;
 
   const dragRef = useRef(false);
   const lastXRef = useRef(0);
   const dirRef = useRef(direction);
   const velRef = useRef(0);
+  const scrollVelRef = useRef(0);
+  const lastScrollRef = useRef(0);
 
   const textLength = spacing;
   const totalText = textLength
@@ -52,12 +57,21 @@ const CurvedLoop = ({
 
   useEffect(() => {
     if (!spacing || !ready) return;
-    // Respect prefers-reduced-motion: hold the marquee static (dragging still works).
+    // Respect prefers-reduced-motion: hold static (dragging still works).
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    lastScrollRef.current = window.scrollY || 0;
     let frame = 0;
     const step = () => {
+      // Scroll-velocity influence, smoothed and clamped so fast flings stay tasteful.
+      const y = window.scrollY || 0;
+      const dv = y - lastScrollRef.current;
+      lastScrollRef.current = y;
+      scrollVelRef.current = scrollVelRef.current * 0.85 + dv * scrollSign * 0.5;
+
       if (!dragRef.current && textPathRef.current) {
-        const delta = dirRef.current === 'right' ? speed : -speed;
+        const base = dirRef.current === 'right' ? speed : -speed;
+        let delta = base + scrollVelRef.current;
+        delta = Math.max(-40, Math.min(40, delta));
         const currentOffset = parseFloat(textPathRef.current.getAttribute('startOffset') || '0');
         let newOffset = currentOffset + delta;
         const wrapPoint = spacing;
@@ -70,9 +84,9 @@ const CurvedLoop = ({
     };
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
-  }, [spacing, speed, ready]);
+  }, [spacing, speed, ready, scrollSign]);
 
-  const onPointerDown = e => {
+  const onPointerDown = (e) => {
     if (!interactive) return;
     dragRef.current = true;
     lastXRef.current = e.clientX;
@@ -80,7 +94,7 @@ const CurvedLoop = ({
     e.target.setPointerCapture(e.pointerId);
   };
 
-  const onPointerMove = e => {
+  const onPointerMove = (e) => {
     if (!interactive || !dragRef.current || !textPathRef.current) return;
     const dx = e.clientX - lastXRef.current;
     lastXRef.current = e.clientX;
@@ -104,7 +118,7 @@ const CurvedLoop = ({
 
   return (
     <div
-      className="w-full flex items-center justify-center overflow-hidden py-2 md:py-3 bg-ink-900 relative z-10"
+      className="w-full flex items-center justify-center overflow-hidden"
       style={{ visibility: ready ? 'visible' : 'hidden', cursor: cursorStyle }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -112,9 +126,7 @@ const CurvedLoop = ({
       onPointerLeave={endDrag}
     >
       <svg
-        // Aspect matches the short viewBox so the band fills width with no
-        // letterboxing and no clipping — a slim strip on every screen.
-        className="select-none w-full overflow-visible block aspect-[1440/84] text-[2.75rem] md:text-[3rem] font-bold uppercase leading-none font-heading"
+        className="select-none w-full overflow-visible block aspect-[1440/84] text-[2.25rem] md:text-[2.75rem] font-bold uppercase leading-none font-heading"
         viewBox="0 0 1440 84"
       >
         <text ref={measureRef} xmlSpace="preserve" style={{ visibility: 'hidden', opacity: 0, pointerEvents: 'none' }}>
@@ -131,6 +143,41 @@ const CurvedLoop = ({
           </text>
         )}
       </svg>
+    </div>
+  );
+};
+
+// Dual-row curved marquee. The rows travel in opposite directions and lean into
+// page scroll from opposite sides, so scrolling visibly perturbs the band.
+const CurvedLoop = ({
+  marqueeText = '',
+  secondaryText,
+  speed = 3,
+  curveAmount = 16,
+  direction = 'left',
+  interactive = true,
+}) => {
+  const opposite = direction === 'left' ? 'right' : 'left';
+  return (
+    <div className="w-full bg-ink-900 relative z-10 py-3 md:py-4">
+      <MarqueeRow
+        text={marqueeText}
+        speed={speed}
+        curveAmount={curveAmount}
+        direction={direction}
+        scrollSign={1}
+        interactive={interactive}
+        className="fill-fog-100"
+      />
+      <MarqueeRow
+        text={secondaryText || marqueeText}
+        speed={speed * 0.85}
+        curveAmount={curveAmount}
+        direction={opposite}
+        scrollSign={-1}
+        interactive={interactive}
+        className="fill-transparent [-webkit-text-stroke:1px_theme(colors.fog.500)]"
+      />
     </div>
   );
 };

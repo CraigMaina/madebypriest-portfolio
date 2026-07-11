@@ -1,18 +1,21 @@
 import { Link } from 'react-router-dom';
 import { GoArrowRight } from 'react-icons/go';
 import { useContent } from '../sanity/content';
+import { useReveal } from '../motion';
 
 const formatDate = (d) =>
   d ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '';
 
 const JournalPreview = () => {
   const posts = useContent('posts').slice(0, 3);
+  const headerRef = useReveal({ y: 24 });
+  const gridRef = useReveal({ children: ':scope > *', y: 32, start: 'top 82%' });
   if (!posts.length) return null;
 
   return (
     <section id="journal" className="bg-ink-900 px-5 md:px-8 py-16 md:py-24 lg:py-32">
       <div className="max-w-6xl mx-auto">
-        <header className="mb-8 md:mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <header ref={headerRef} className="mb-8 md:mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-accent text-xs md:text-sm font-semibold uppercase tracking-[0.25em] mb-3">
               Journal
@@ -29,7 +32,7 @@ const JournalPreview = () => {
           </Link>
         </header>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 md:gap-6">
+        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-3 gap-5 md:gap-6">
           {posts.map((post) => (
             <Link
               key={post.slug}

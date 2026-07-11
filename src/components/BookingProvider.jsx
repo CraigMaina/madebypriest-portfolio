@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { GoX } from 'react-icons/go';
+import { lockScroll, unlockScroll } from '../motion';
 
 const BOOKING_URL = import.meta.env.VITE_BOOKING_URL;
 
@@ -30,6 +31,7 @@ export function BookingProvider({ children }) {
     if (!open) return;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    lockScroll(); // pause Lenis so the modal iframe scrolls, not the page
     const onKey = (e) => {
       if (e.key === 'Escape') setOpen(false);
     };
@@ -37,6 +39,7 @@ export function BookingProvider({ children }) {
     return () => {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
+      unlockScroll();
     };
   }, [open]);
 

@@ -1,6 +1,7 @@
 import { useLayoutEffect, useEffect, useRef, useState } from 'react';
-import { gsap } from 'gsap';
 import { GoArrowUpRight } from 'react-icons/go';
+import { gsap } from '../motion/gsap';
+import { DURATION, EASE, useMagnetic } from '../motion';
 import { useBooking } from './BookingProvider';
 
 const CardNav = ({
@@ -8,13 +9,15 @@ const CardNav = ({
   logoAlt = 'Logo',
   items,
   className = '',
-  ease = 'power3.out'
+  ease = 'power3.out',
+  ready = false
 }) => {
   const { hasBooking, openBooking } = useBooking();
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navRef = useRef(null);
+  const ctaMagnetRef = useMagnetic({ strength: 0.3 });
 
   // Condense the (now fixed) nav once the user scrolls past the hero fold.
   useEffect(() => {
@@ -25,6 +28,26 @@ const CardNav = ({
   }, []);
   const cardsRef = useRef([]);
   const tlRef = useRef(null);
+
+  // Nav arrives last: once the page is ready (curtain lifting), the top bar
+  // drops into place after the hero has staged in. Reduced-motion skips this
+  // and the bar is simply present.
+  useLayoutEffect(() => {
+    if (!ready) return;
+    const bar = navRef.current?.querySelector('.card-nav-top');
+    if (!bar) return;
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      // Explicit fromTo so a StrictMode double-invoke can't strand the bar hidden.
+      const tw = gsap.fromTo(
+        bar,
+        { autoAlpha: 0, y: -18 },
+        { autoAlpha: 1, y: 0, duration: DURATION.slow, ease: EASE.entrance, delay: 0.6 }
+      );
+      return () => tw.kill();
+    });
+    return () => mm.revert();
+  }, [ready]);
 
   const calculateHeight = () => {
     const navEl = navRef.current;
@@ -186,22 +209,24 @@ const CardNav = ({
             )}
           </div>
 
-          {hasBooking ? (
-            <button
-              type="button"
-              onClick={openBooking}
-              className="card-nav-cta-button hidden md:inline-flex no-underline border-0 rounded-[calc(1rem-0.35rem)] px-4 items-center h-full font-semibold cursor-pointer bg-accent text-ink-900 hover:bg-accent-hover transition-colors duration-300"
-            >
-              Book a Call
-            </button>
-          ) : (
-            <a
-              href="#contact"
-              className="card-nav-cta-button hidden md:inline-flex no-underline border-0 rounded-[calc(1rem-0.35rem)] px-4 items-center h-full font-semibold cursor-pointer bg-accent text-ink-900 hover:bg-accent-hover transition-colors duration-300"
-            >
-              Start a Project
-            </a>
-          )}
+          <span ref={ctaMagnetRef} className="hidden md:inline-flex h-full">
+            {hasBooking ? (
+              <button
+                type="button"
+                onClick={openBooking}
+                className="card-nav-cta-button inline-flex no-underline border-0 rounded-[calc(1rem-0.35rem)] px-4 items-center h-full font-semibold cursor-pointer bg-accent text-ink-900 hover:bg-accent-hover active:scale-95 transition duration-300"
+              >
+                Book a Call
+              </button>
+            ) : (
+              <a
+                href="#contact"
+                className="card-nav-cta-button inline-flex no-underline border-0 rounded-[calc(1rem-0.35rem)] px-4 items-center h-full font-semibold cursor-pointer bg-accent text-ink-900 hover:bg-accent-hover active:scale-95 transition duration-300"
+              >
+                Start a Project
+              </a>
+            )}
+          </span>
         </div>
 
         <div

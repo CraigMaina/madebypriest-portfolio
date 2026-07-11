@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { PortableText } from '@portabletext/react';
 import SEO from '../components/SEO';
 import BlogHeader from '../components/BlogHeader';
+import { PostSkeleton } from '../components/Skeleton';
 import { fetchPost } from '../sanity/content';
 
 const formatDate = (d) =>
@@ -46,7 +47,7 @@ function BlogPostPage() {
       <BlogHeader />
 
       {post === undefined ? (
-        <div className="max-w-3xl mx-auto px-5 md:px-8 py-20 text-fog-500">Loading…</div>
+        <PostSkeleton />
       ) : post === null ? (
         <div className="max-w-3xl mx-auto px-5 md:px-8 py-20">
           <SEO title="Not found — Made by Priest" path={`/blog/${slug}`} />

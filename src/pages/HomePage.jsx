@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 
+import { gsap, DURATION, EASE, useParallax, useMagnetic } from '../motion';
 import CardNav from '../components/CardNav';
 import { useBooking } from '../components/BookingProvider';
 import HeroBackground from '../components/HeroBackground';
@@ -49,6 +50,11 @@ function HomePage() {
   const [referralProject, setReferralProject] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSiteVisible, setIsSiteVisible] = useState(false);
+  const heroRef = useRef(null);
+  // Hero background drifts slower than the page as you scroll away (overscanned
+  // + clipped so the shader never exposes an edge). No-op under reduced-motion.
+  const heroBgRef = useParallax({ amount: 8, start: 'top top', end: 'bottom top' });
+  const ctaMagnetRef = useMagnetic({ strength: 0.4 });
 
   useEffect(() => {
     let unmountTimer;
@@ -61,7 +67,9 @@ function HomePage() {
       if (settled) return;
       settled = true;
       setIsLoading(false);
-      unmountTimer = setTimeout(() => setIsSiteVisible(true), 800);
+      // Keep the preloader mounted through the curtain lift (~0.85s) before
+      // dropping it from the DOM.
+      unmountTimer = setTimeout(() => setIsSiteVisible(true), 1000);
     };
 
     const minSplash = 400;
@@ -80,23 +88,48 @@ function HomePage() {
     return () => clearTimeout(unmountTimer);
   }, []);
 
+  // Hero entrance: headline -> subhead -> CTA stagger up as the curtain lifts.
+  // Registered under no-preference only, so reduced-motion leaves the hero fully
+  // visible with nothing to reveal.
+  useLayoutEffect(() => {
+    if (isLoading) return; // stage the reveal the moment the curtain begins lifting
+    const el = heroRef.current;
+    if (!el) return;
+
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      // Explicit fromTo so the visible end state can't be lost to a StrictMode
+      // double-invoke (would otherwise strand the CTA at opacity 0).
+      const tween = gsap.fromTo(
+        el.querySelectorAll('[data-entrance]'),
+        { opacity: 0, y: 26 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: DURATION.slow,
+          ease: EASE.entrance,
+          stagger: 0.12,
+          delay: 0.2,
+        }
+      );
+      return () => tween.kill();
+    });
+    return () => mm.revert();
+  }, [isLoading]);
+
   return (
     <>
       <SEO />
       {!isSiteVisible && <Preloader isLoading={isLoading} />}
 
-      <div
-        className={`
-          bg-ink-900 text-fog-100 min-h-screen
-          transition-opacity duration-1000 ease-in-out
-          ${isLoading ? 'opacity-0' : 'opacity-100'}
-        `}
-      >
-        <CardNav items={navItems} />
+      {/* No opacity gate here — the Preloader curtain owns the reveal so the
+          hero can be staged beneath it and staggered in as it lifts. */}
+      <div className="bg-ink-900 text-fog-100 min-h-screen">
+        <CardNav items={navItems} ready={!isLoading} />
 
         {/* Hero */}
-        <div className="relative min-h-screen flex flex-col items-center justify-center">
-          <div className="absolute inset-0 z-0">
+        <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+          <div ref={heroBgRef} className="absolute -top-[12%] -bottom-[12%] inset-x-0 z-0">
             <HeroBackground
               waveColor={[1.0, 1.0, 1.0]}
               disableAnimation={false}
@@ -108,47 +141,48 @@ function HomePage() {
               waveSpeed={0.05}
             />
           </div>
-          <div className="relative z-10 text-center px-5 md:px-8 max-w-5xl mx-auto">
-            <h1 className="text-4xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tighter font-heading leading-tight">
+          <div ref={heroRef} className="relative z-10 text-center px-5 md:px-8 max-w-5xl mx-auto">
+            <h1 data-entrance className="text-4xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tighter font-heading leading-tight">
               Videos That Feel Like{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-fog-100 to-fog-500">
                 Blockbusters.
               </span>
             </h1>
 
-            <p className="text-lg md:text-2xl text-fog-300 mt-6 font-light">
+            <p data-entrance className="text-lg md:text-2xl text-fog-300 mt-6 font-light">
               Cinematic editing that turns brands into icons and viewers into fans.
             </p>
 
-            {hasBooking ? (
-              <button
-                type="button"
-                onClick={openBooking}
-                className="inline-block mt-8 px-8 py-4 bg-accent text-ink-900 font-bold rounded-full hover:bg-accent-hover hover:scale-105 transition duration-300 ease-out tracking-wide"
-              >
-                Start a Project
-              </button>
-            ) : (
-              <a
-                href="#contact"
-                className="inline-block mt-8 px-8 py-4 bg-accent text-ink-900 font-bold rounded-full hover:bg-accent-hover hover:scale-105 transition duration-300 ease-out tracking-wide"
-              >
-                Start a Project
-              </a>
-            )}
+            <span ref={ctaMagnetRef} data-entrance className="inline-block mt-8">
+              {hasBooking ? (
+                <button
+                  type="button"
+                  onClick={openBooking}
+                  className="inline-block px-8 py-4 bg-accent text-ink-900 font-bold rounded-full hover:bg-accent-hover hover:scale-105 active:scale-95 transition duration-300 ease-out tracking-wide"
+                >
+                  Start a Project
+                </button>
+              ) : (
+                <a
+                  href="#contact"
+                  className="inline-block px-8 py-4 bg-accent text-ink-900 font-bold rounded-full hover:bg-accent-hover hover:scale-105 active:scale-95 transition duration-300 ease-out tracking-wide"
+                >
+                  Start a Project
+                </a>
+              )}
+            </span>
           </div>
         </div>
 
-        {/* Curved marquee */}
-        <div className="w-full bg-ink-900">
-          <CurvedLoop
-            marqueeText="Helping ✦ Brands ✦ Tell ✦ Stories ✦ That ✦ Sell ✦"
-            speed={3}
-            curveAmount={0}
-            direction="left"
-            interactive={true}
-          />
-        </div>
+        {/* Curved dual-row marquee (scroll-velocity reactive) */}
+        <CurvedLoop
+          marqueeText="Helping ✦ Brands ✦ Tell ✦ Stories ✦ That ✦ Sell ✦"
+          secondaryText="Cinematic ✦ Edits ✦ That ✦ Turn ✦ Attention ✦ Into ✦ Fans ✦"
+          speed={3}
+          curveAmount={16}
+          direction="left"
+          interactive={true}
+        />
 
         <WorkSection setReferralProject={setReferralProject} />
         <BeforeAfterSlider />
