@@ -8,6 +8,16 @@ export default defineType({
     defineField({ name: 'title', type: 'string', validation: (r) => r.required() }),
     defineField({ name: 'category', type: 'string', description: 'e.g. Music Video, Commercial, Social Ad' }),
     defineField({
+      name: 'audience',
+      type: 'string',
+      description: 'Which audience filter this project appears under on the site.',
+      options: {
+        list: ['Ads & Commercial', 'Lifestyle & Social', 'Music Videos', 'Brand Films'],
+        layout: 'radio',
+      },
+      initialValue: 'Brand Films',
+    }),
+    defineField({
       name: 'type',
       type: 'string',
       description: 'Reel = vertical/social, Widescreen = horizontal 16:9.',

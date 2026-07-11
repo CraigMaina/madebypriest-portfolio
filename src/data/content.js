@@ -3,14 +3,14 @@
 // or a given collection is empty.
 
 export const fallbackProjects = [
-  { title: 'Plasma', category: 'Music Video', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_plasma.jpg', videoUrl: '/videos/plasma.webm' },
-  { title: 'Cosmic Bloom', category: 'Generative Art', type: 'Widescreen', orientation: 'landscape', thumbnail: '/images/thumb_cosmic_bloom.jpg', videoUrl: '/videos/cosmic_bloom.webm' },
-  { title: 'Grid Wave', category: 'Social Ad', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_grid_wave.jpg', videoUrl: '/videos/grid_wave.webm' },
-  { title: 'Fire', category: 'Commercial', type: 'Widescreen', orientation: 'landscape', thumbnail: '/images/thumb_fire.jpg', videoUrl: '/videos/fire.webm' },
-  { title: 'Chromatic', category: 'Reel', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_chromatic.jpg', videoUrl: '/videos/chromatic.webm' },
-  { title: 'Speed Meteor', category: 'VFX', type: 'Widescreen', orientation: 'landscape', thumbnail: '/images/thumb_speed_meteor.jpg', videoUrl: '/videos/speed_meteor.webm' },
-  { title: 'Aura', category: 'Music Video', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_aura.jpg', videoUrl: '/videos/aura.webm' },
-  { title: 'Smoke', category: 'Brand Story', type: 'Widescreen', orientation: 'landscape', thumbnail: '/images/thumb_smoke.jpg', videoUrl: '/videos/smoke.webm' },
+  { title: 'Plasma', category: 'Music Video', audience: 'Music Videos', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_plasma.jpg', videoUrl: '/videos/plasma.webm' },
+  { title: 'Cosmic Bloom', category: 'Generative Art', audience: 'Brand Films', type: 'Widescreen', orientation: 'landscape', thumbnail: '/images/thumb_cosmic_bloom.jpg', videoUrl: '/videos/cosmic_bloom.webm' },
+  { title: 'Grid Wave', category: 'Social Ad', audience: 'Lifestyle & Social', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_grid_wave.jpg', videoUrl: '/videos/grid_wave.webm' },
+  { title: 'Fire', category: 'Commercial', audience: 'Ads & Commercial', type: 'Widescreen', orientation: 'landscape', thumbnail: '/images/thumb_fire.jpg', videoUrl: '/videos/fire.webm' },
+  { title: 'Chromatic', category: 'Reel', audience: 'Lifestyle & Social', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_chromatic.jpg', videoUrl: '/videos/chromatic.webm' },
+  { title: 'Speed Meteor', category: 'VFX', audience: 'Ads & Commercial', type: 'Widescreen', orientation: 'landscape', thumbnail: '/images/thumb_speed_meteor.jpg', videoUrl: '/videos/speed_meteor.webm' },
+  { title: 'Aura', category: 'Music Video', audience: 'Music Videos', type: 'Reel', orientation: 'portrait', thumbnail: '/images/thumb_aura.jpg', videoUrl: '/videos/aura.webm' },
+  { title: 'Smoke', category: 'Brand Story', audience: 'Brand Films', type: 'Widescreen', orientation: 'landscape', thumbnail: '/images/thumb_smoke.jpg', videoUrl: '/videos/smoke.webm' },
 ];
 
 export const fallbackGradings = [
