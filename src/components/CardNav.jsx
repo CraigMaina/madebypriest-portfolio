@@ -173,7 +173,7 @@ const CardNav = ({
       >
         <div className="card-nav-top absolute inset-x-0 top-0 h-[60px] flex items-center justify-between p-2 pl-[1.1rem] z-[2]">
           <div
-            className={`hamburger-menu ${isHamburgerOpen ? 'open' : ''} group h-full flex flex-col items-center justify-center cursor-pointer gap-[6px] order-2 md:order-none text-fog-100`}
+            className={`hamburger-menu ${isHamburgerOpen ? 'open' : ''} group h-full flex flex-col items-center justify-center cursor-pointer gap-[6px] order-1 md:order-none text-fog-100`}
             onClick={toggleMenu}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
@@ -199,29 +199,29 @@ const CardNav = ({
             />
           </div>
 
-          <div className="logo-container flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 order-1 md:order-none">
+          <div className="logo-container flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 order-2 md:order-none">
             {logo ? (
                  <img src={logo} alt={logoAlt} className="logo h-[28px]" />
             ) : (
-                <span className="font-heading text-lg md:text-xl font-bold tracking-tight text-fog-100">
+                <span className="font-heading text-base md:text-xl font-bold tracking-tight text-fog-100 whitespace-nowrap">
                   Made by Priest
                 </span>
             )}
           </div>
 
-          <span ref={ctaMagnetRef} className="hidden md:inline-flex h-full">
+          <span ref={ctaMagnetRef} className="inline-flex h-full order-3 md:order-none">
             {hasBooking ? (
               <button
                 type="button"
                 onClick={openBooking}
-                className="card-nav-cta-button inline-flex no-underline border-0 rounded-[calc(1rem-0.35rem)] px-4 items-center h-full font-semibold cursor-pointer bg-accent text-ink-900 hover:bg-accent-hover active:scale-95 transition duration-300"
+                className="card-nav-cta-button inline-flex whitespace-nowrap no-underline border-0 rounded-[calc(1rem-0.35rem)] px-3 md:px-4 items-center h-full text-sm md:text-base font-semibold cursor-pointer bg-accent text-ink-900 hover:bg-accent-hover active:scale-95 transition duration-300"
               >
                 Book a Call
               </button>
             ) : (
               <a
                 href="#contact"
-                className="card-nav-cta-button inline-flex no-underline border-0 rounded-[calc(1rem-0.35rem)] px-4 items-center h-full font-semibold cursor-pointer bg-accent text-ink-900 hover:bg-accent-hover active:scale-95 transition duration-300"
+                className="card-nav-cta-button inline-flex whitespace-nowrap no-underline border-0 rounded-[calc(1rem-0.35rem)] px-3 md:px-4 items-center h-full text-sm md:text-base font-semibold cursor-pointer bg-accent text-ink-900 hover:bg-accent-hover active:scale-95 transition duration-300"
               >
                 Start a Project
               </a>
