@@ -31,6 +31,8 @@ export default defineType({
       options: { list: ['portrait', 'landscape', 'square'], layout: 'radio' },
       initialValue: 'landscape',
     }),
+    defineField({ name: 'duration', type: 'string', description: 'Clip length as a timecode, e.g. 0:48 — shown as a badge on the card.' }),
+    defineField({ name: 'result', type: 'string', description: 'One-line outcome/stat, e.g. "3.1M views in two weeks" — shown on the featured card.' }),
     defineField({ name: 'thumbnail', type: 'image', options: { hotspot: true } }),
     defineField({ name: 'videoUrl', title: 'Video URL', type: 'url', description: 'Hosted reel link (CDN / Vimeo direct / Bunny / Cloudflare Stream).' }),
     defineField({ name: 'order', type: 'number', description: 'Lower numbers show first.' }),

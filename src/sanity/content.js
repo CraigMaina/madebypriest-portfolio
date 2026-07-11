@@ -17,7 +17,7 @@ import {
 // local fallback content.
 const collections = {
   projects: {
-    query: `*[_type=="project"]|order(coalesce(order,999) asc){title,category,audience,type,orientation,thumbnail,videoUrl}`,
+    query: `*[_type=="project"]|order(coalesce(order,999) asc){title,category,audience,type,orientation,duration,result,thumbnail,videoUrl}`,
     map: (rows) =>
       rows.map((r) => ({
         title: r.title,
@@ -25,6 +25,8 @@ const collections = {
         audience: r.audience || 'Brand Films',
         type: r.type || 'Film',
         orientation: r.orientation || 'landscape',
+        duration: r.duration || '',
+        result: r.result || '',
         thumbnail: imageUrl(r.thumbnail, 800) || FALLBACK_THUMB,
         videoUrl: r.videoUrl || '',
       })),
