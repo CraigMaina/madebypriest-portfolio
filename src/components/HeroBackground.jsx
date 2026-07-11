@@ -14,16 +14,25 @@ const Dither = lazy(() => import('./Dither'));
 // The drift is disabled under prefers-reduced-motion (see index.css).
 const StaticHero = () => (
   <div className="relative w-full h-full overflow-hidden bg-ink-900">
-    {/* Brighter base so the hero clearly reads as a lit backdrop, not black. */}
-    <div className="absolute inset-0 bg-[radial-gradient(135%_120%_at_50%_-10%,theme(colors.ink.500)_0%,theme(colors.ink.700)_38%,theme(colors.ink.900)_70%)]" />
+    {/* Lit base so the hero clearly reads as a backdrop, not black. */}
+    <div className="absolute inset-0 bg-[radial-gradient(140%_120%_at_50%_-15%,theme(colors.ink.500)_0%,theme(colors.ink.700)_35%,theme(colors.ink.900)_72%)]" />
+
+    {/* Independently drifting colour mesh (transform-only, GPU-composited). */}
     <div
-      className="hero-aurora absolute -inset-1/4"
-      style={{
-        background:
-          'radial-gradient(42% 42% at 26% 28%, rgba(230,180,80,0.30), transparent 68%), radial-gradient(46% 46% at 74% 66%, rgba(150,160,190,0.20), transparent 70%)',
-      }}
+      className="hero-mesh hero-mesh-1 absolute -left-[15%] -top-[20%] h-[80%] w-[80%]"
+      style={{ background: 'radial-gradient(circle at center, rgba(230,180,80,0.42) 0%, transparent 60%)' }}
     />
-    {/* Dithered noise overlay — echoes the desktop shader's texture. */}
+    <div
+      className="hero-mesh hero-mesh-2 absolute -right-[15%] -bottom-[20%] h-[85%] w-[85%]"
+      style={{ background: 'radial-gradient(circle at center, rgba(110,140,225,0.32) 0%, transparent 62%)' }}
+    />
+    <div
+      className="hero-mesh hero-mesh-3 absolute right-[5%] top-[8%] h-[60%] w-[60%]"
+      style={{ background: 'radial-gradient(circle at center, rgba(205,90,135,0.26) 0%, transparent 60%)' }}
+    />
+
+    {/* Dither dot grid + film grain — the signature textured/dithered look. */}
+    <div className="hero-dither absolute inset-0" aria-hidden="true" />
     <div className="hero-grain absolute inset-0" aria-hidden="true" />
   </div>
 );

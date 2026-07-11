@@ -55,28 +55,46 @@
 }
 
 /* --- Animated static hero (mobile / reduced-shader fallback) --- */
-/* GPU-composited drift (transform only) + a static film-grain overlay. */
-@keyframes hero-drift {
-  0%,
-  100% {
-    transform: translate3d(-2%, -1%, 0) scale(1.08);
-  }
-  50% {
-    transform: translate3d(2%, 1%, 0) scale(1.18);
-  }
+/* A drifting colour mesh (transform-only, GPU-composited) under a dither dot
+   grid + film grain — echoes the desktop shader's textured look with zero JS. */
+@keyframes hero-mesh-1 {
+  0%, 100% { transform: translate3d(-6%, -4%, 0); }
+  50% { transform: translate3d(10%, 8%, 0); }
 }
-.hero-aurora {
-  animation: hero-drift 22s ease-in-out infinite;
+@keyframes hero-mesh-2 {
+  0%, 100% { transform: translate3d(5%, 6%, 0); }
+  50% { transform: translate3d(-9%, -7%, 0); }
+}
+@keyframes hero-mesh-3 {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(8%, -8%, 0); }
+}
+.hero-mesh {
   will-change: transform;
+}
+.hero-mesh-1 {
+  animation: hero-mesh-1 17s ease-in-out infinite;
+}
+.hero-mesh-2 {
+  animation: hero-mesh-2 22s ease-in-out infinite;
+}
+.hero-mesh-3 {
+  animation: hero-mesh-3 27s ease-in-out infinite;
+}
+.hero-dither {
+  background-image: radial-gradient(rgba(245, 245, 247, 0.16) 0.7px, transparent 0.8px);
+  background-size: 3px 3px;
 }
 .hero-grain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 120px 120px;
-  opacity: 0.28;
+  opacity: 0.24;
   mix-blend-mode: soft-light;
 }
 @media (prefers-reduced-motion: reduce) {
-  .hero-aurora {
+  .hero-mesh-1,
+  .hero-mesh-2,
+  .hero-mesh-3 {
     animation: none;
   }
 }
