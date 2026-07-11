@@ -9,7 +9,7 @@ const formatDate = (d) =>
 const JournalPreview = () => {
   const posts = useContent('posts').slice(0, 3);
   const headerRef = useReveal({ y: 24 });
-  const gridRef = useReveal({ children: ':scope > *', y: 32, start: 'top 82%' });
+  const gridRef = useReveal({ children: ':scope > *', y: 24, start: 'top 90%' });
   if (!posts.length) return null;
 
   return (

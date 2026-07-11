@@ -17,9 +17,9 @@ export default function MotionProvider({ children }) {
     if (prefersReducedMotion()) return;
 
     const lenis = new Lenis({
-      duration: 1.1,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // ~expo.out
+      lerp: 0.12, // tighter than the old duration:1.1 easing — less floaty/laggy
       smoothWheel: true,
+      wheelMultiplier: 1,
       autoRaf: false, // we drive the RAF ourselves (below)
     });
     _bindLenis(lenis);

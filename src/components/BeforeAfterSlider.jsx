@@ -76,7 +76,7 @@ const Chip = ({ children, tone }) => (
 const BeforeAfterSlider = () => {
   const sliders = useContent('gradings');
   const headingRef = useReveal({ y: 24 });
-  const gridRef = useReveal({ children: ':scope > *', y: 36, start: 'top 80%' });
+  const gridRef = useReveal({ children: ':scope > *', y: 24, start: 'top 88%' });
   const timelineRef = useRef(null);
 
   // "Cut" reveal: clips scale in from their edit point, the waveform rises, and
@@ -90,7 +90,7 @@ const BeforeAfterSlider = () => {
       const track = el.querySelector('[data-track]');
       const playhead = el.querySelector('[data-playhead]');
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: el, start: 'top 78%', once: true, invalidateOnRefresh: true },
+        scrollTrigger: { trigger: el, start: 'top 85%', once: true, invalidateOnRefresh: true },
       });
       // Explicit fromTo so a StrictMode double-invoke can't leave clips/bars
       // stranded collapsed (scale 0).
@@ -156,7 +156,7 @@ const BeforeAfterSlider = () => {
           }
         };
         apply();
-        const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: 'top 78%', once: true } });
+        const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: 'top 85%', once: true } });
         tl.to(proxy, { v: 82, duration: 1.1, ease: 'power2.inOut', onUpdate: apply }).to(proxy, {
           v: 50,
           duration: 0.5,

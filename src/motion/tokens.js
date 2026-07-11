@@ -21,5 +21,6 @@ export const CSS_EASE = {
   move: 'cubic-bezier(0.65, 0, 0.35, 1)', // ~= power2.inOut
 };
 
-// Default stagger step (seconds) for grouped reveals.
-export const STAGGER = 0.08;
+// Default stagger step (seconds) for grouped reveals. Kept small so groups read
+// as one quick wave, not a slow trickle.
+export const STAGGER = 0.06;

@@ -53,7 +53,7 @@ function HomePage() {
   const heroRef = useRef(null);
   // Hero background drifts slower than the page as you scroll away (overscanned
   // + clipped so the shader never exposes an edge). No-op under reduced-motion.
-  const heroBgRef = useParallax({ amount: 8, start: 'top top', end: 'bottom top' });
+  const heroBgRef = useParallax({ amount: 5, start: 'top top', end: 'bottom top' });
   const ctaMagnetRef = useMagnetic({ strength: 0.4 });
 
   useEffect(() => {

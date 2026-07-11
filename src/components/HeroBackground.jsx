@@ -14,14 +14,16 @@ const Dither = lazy(() => import('./Dither'));
 // The drift is disabled under prefers-reduced-motion (see index.css).
 const StaticHero = () => (
   <div className="relative w-full h-full overflow-hidden bg-ink-900">
-    <div className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_0%,theme(colors.ink.600)_0%,theme(colors.ink.900)_58%)]" />
+    {/* Brighter base so the hero clearly reads as a lit backdrop, not black. */}
+    <div className="absolute inset-0 bg-[radial-gradient(135%_120%_at_50%_-10%,theme(colors.ink.500)_0%,theme(colors.ink.700)_38%,theme(colors.ink.900)_70%)]" />
     <div
       className="hero-aurora absolute -inset-1/4"
       style={{
         background:
-          'radial-gradient(35% 35% at 28% 30%, rgba(230,180,80,0.15), transparent 70%), radial-gradient(40% 40% at 72% 64%, rgba(150,150,175,0.10), transparent 72%)',
+          'radial-gradient(42% 42% at 26% 28%, rgba(230,180,80,0.30), transparent 68%), radial-gradient(46% 46% at 74% 66%, rgba(150,160,190,0.20), transparent 70%)',
       }}
     />
+    {/* Dithered noise overlay — echoes the desktop shader's texture. */}
     <div className="hero-grain absolute inset-0" aria-hidden="true" />
   </div>
 );

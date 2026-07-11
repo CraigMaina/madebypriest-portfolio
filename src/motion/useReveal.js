@@ -13,7 +13,7 @@ import { DURATION, EASE, STAGGER } from './tokens';
 //   opacity   — starting opacity (default 0)
 //   duration  — seconds (default DURATION.slow)
 //   ease      — GSAP ease (default EASE.entrance)
-//   start     — ScrollTrigger start (default 'top 85%')
+//   start     — ScrollTrigger start (default 'top 92%' — fires as it enters)
 //   children  — selector; when set, staggers matching children instead of the container
 //   stagger   — override stagger step (default STAGGER when children is set)
 export function useReveal(options = {}) {
@@ -22,11 +22,14 @@ export function useReveal(options = {}) {
     const el = ref.current;
     if (!el) return;
     const {
-      y = 24,
+      y = 18,
       opacity = 0,
+      // Earlier trigger + smaller offset so content is basically visible the moment
+      // it scrolls into view instead of drifting in late. expo.out front-loads the
+      // motion, so it reads snappy without a shorter duration.
       duration = DURATION.slow,
       ease = EASE.entrance,
-      start = 'top 85%',
+      start = 'top 92%',
       children: childSelector,
       stagger,
     } = options;

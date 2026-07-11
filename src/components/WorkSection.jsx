@@ -38,7 +38,7 @@ const WorkSection = ({ setReferralProject }) => {
   // Reveal the grid as a whole (its own transform) rather than staggering the
   // cards — the filter transition owns the individual cards, so sharing targets
   // with a child-stagger reveal would let them fight and strand cards hidden.
-  const gridRef = useReveal({ y: 24, start: 'top 82%' });
+  const gridRef = useReveal({ y: 20, start: 'top 90%' });
   const didMountRef = useRef(false);
 
   // Per-audience project counts for the filter rail.

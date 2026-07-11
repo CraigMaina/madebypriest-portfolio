@@ -22,7 +22,7 @@ const ContactForm = ({ referralProject }) => {
 
   // Columns rise in on scroll; the background drifts (overscanned + clipped by
   // the section's overflow-hidden). Both no-op under reduced-motion.
-  const gridRef = useReveal({ children: ':scope > *', y: 30, start: 'top 75%' });
+  const gridRef = useReveal({ children: ':scope > *', y: 24, start: 'top 88%' });
   const bgRef = useParallax({ amount: 8 });
 
   useEffect(() => {
