@@ -90,7 +90,7 @@ const BeforeAfterSlider = () => {
       const track = el.querySelector('[data-track]');
       const playhead = el.querySelector('[data-playhead]');
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: el, start: 'top 78%', once: true },
+        scrollTrigger: { trigger: el, start: 'top 78%', once: true, invalidateOnRefresh: true },
       });
       // Explicit fromTo so a StrictMode double-invoke can't leave clips/bars
       // stranded collapsed (scale 0).
@@ -121,7 +121,9 @@ const BeforeAfterSlider = () => {
           playhead,
           { x: 0, autoAlpha: 0 },
           {
-            x: track ? track.clientWidth * 0.68 : 0,
+            // Function-based + invalidateOnRefresh so the sweep target tracks the
+            // current track width (orientation change before it plays).
+            x: () => (track ? track.clientWidth * 0.68 : 0),
             autoAlpha: 1,
             duration: DURATION.entrance,
             ease: EASE.move,
@@ -133,6 +135,46 @@ const BeforeAfterSlider = () => {
     return () => mm.revert();
   }, []);
 
+  // Grading sliders: a one-time slow divider sweep on scroll-in (before -> after
+  // -> centre), then control is the user's. Skipped under reduced-motion, which
+  // leaves the divider at the default centre.
+  useLayoutEffect(() => {
+    const root = gridRef.current;
+    if (!root) return;
+    const els = root.querySelectorAll('img-comparison-slider');
+    if (!els.length) return;
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const tls = [];
+      els.forEach((el) => {
+        const proxy = { v: 20 };
+        const apply = () => {
+          try {
+            el.value = proxy.v;
+          } catch {
+            /* element not upgraded yet */
+          }
+        };
+        apply();
+        const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: 'top 78%', once: true } });
+        tl.to(proxy, { v: 82, duration: 1.1, ease: 'power2.inOut', onUpdate: apply }).to(proxy, {
+          v: 50,
+          duration: 0.5,
+          ease: 'power2.out',
+          onUpdate: apply,
+        });
+        tls.push(tl);
+      });
+      return () =>
+        tls.forEach((t) => {
+          t.scrollTrigger?.kill();
+          t.kill();
+        });
+    });
+    return () => mm.revert();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sliders]);
+
   return (
     <section id="craft" className="py-16 md:py-24 lg:py-32 bg-ink-900 text-fog-100">
       <div className="max-w-6xl mx-auto px-5 md:px-8">
@@ -142,8 +184,8 @@ const BeforeAfterSlider = () => {
             The Craft
           </h2>
           <p className="text-base md:text-lg text-fog-300 mt-4 max-w-2xl mx-auto leading-relaxed">
-            The shot is only half the story. The grade is where it becomes cinema.
-            Drag to see the difference.
+            Grade, cut, and sound — the three passes that turn footage into film.
+            Drag any frame to see the grade; the timeline below is the cut.
           </p>
         </div>
 
@@ -199,14 +241,20 @@ const BeforeAfterSlider = () => {
           ref={timelineRef}
           className="relative mt-12 md:mt-16 overflow-hidden rounded-card border border-ink-700 bg-ink-800/50 p-5 md:p-7"
         >
+          {/* Timeline label */}
+          <div className="mb-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="text-accent text-xs font-semibold uppercase tracking-[0.25em]">The Cut</span>
+            <span className="text-fog-500 text-xs md:text-sm">Pacing, rhythm &amp; sound design</span>
+          </div>
+
           {/* Count-up stats */}
-          <div className="grid grid-cols-3 gap-3 md:gap-6 mb-6 md:mb-8">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 mb-6 md:mb-8">
             {STATS.map((s) => (
               <div key={s.label} className="text-center md:text-left">
-                <p className="font-heading text-3xl md:text-5xl font-bold text-fog-100">
+                <p className="font-heading text-2xl sm:text-3xl md:text-5xl font-bold text-fog-100 tabular-nums">
                   <CountUp to={s.to} suffix={s.suffix} />
                 </p>
-                <p className="mt-1 text-xs md:text-sm text-fog-500">{s.label}</p>
+                <p className="mt-1 text-[11px] sm:text-xs md:text-sm text-fog-500">{s.label}</p>
               </div>
             ))}
           </div>

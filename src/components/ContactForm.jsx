@@ -86,7 +86,7 @@ const ContactForm = ({ referralProject }) => {
   const isSubmitting = status === 'submitting';
 
   return (
-    <div ref={sectionRef} id="contact" className="relative w-full min-h-screen overflow-hidden flex items-center justify-center p-8 md:p-16">
+    <div ref={sectionRef} id="contact" className="relative w-full min-h-[100svh] overflow-hidden flex items-center justify-center p-8 md:p-16">
 
       {/* --- 1. Video Background (lazy; static poster under reduced-motion) --- */}
       <div ref={bgRef} className="absolute -top-[12%] -bottom-[12%] inset-x-0 z-0">

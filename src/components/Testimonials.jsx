@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { FaQuoteLeft } from 'react-icons/fa';
 import { useContent } from '../sanity/content';
 import { useReveal } from '../motion';
@@ -24,15 +25,21 @@ const Avatar = ({ name, size = 'md' }) => (
 const TestimonialCard = ({ item }) => (
   <div className="flex h-full flex-col justify-between rounded-card border border-ink-700 bg-ink-800 p-6 md:p-7 shadow-card">
     <div>
-      <FaQuoteLeft className="text-accent/80 text-2xl mb-4" aria-hidden="true" />
-      <p className="text-base md:text-lg text-fog-100 leading-relaxed">{item.quote}</p>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <FaQuoteLeft className="text-accent/80 text-2xl" aria-hidden="true" />
+        {item.project && (
+          <span className="shrink-0 rounded-full bg-accent/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-accent ring-1 ring-accent/20">
+            {item.project}
+          </span>
+        )}
+      </div>
+      <p className="text-base md:text-lg text-fog-100 leading-relaxed line-clamp-5 md:line-clamp-none">
+        {item.quote}
+      </p>
     </div>
     <div className="mt-6 flex items-center gap-3">
       <Avatar name={item.name} />
-      <div className="min-w-0">
-        <p className="text-fog-100 font-semibold truncate">{item.name}</p>
-        <p className="text-fog-500 text-sm truncate">{item.project}</p>
-      </div>
+      <p className="text-fog-100 font-semibold truncate">{item.name}</p>
     </div>
   </div>
 );
@@ -40,7 +47,7 @@ const TestimonialCard = ({ item }) => (
 // One infinite marquee row. Two identical tracks tile seamlessly; `reverse`
 // flips the travel direction. Both tracks freeze under reduced-motion (the
 // .animate-scroll-x rule in index.css is disabled there), leaving cards visible.
-const MarqueeRow = ({ items, reverse = false }) => {
+const MarqueeRow = ({ items, reverse = false, paused = false }) => {
   const doubled = [...items, ...items];
   return (
     <div className="flex w-max">
@@ -49,11 +56,11 @@ const MarqueeRow = ({ items, reverse = false }) => {
           key={track}
           className={`flex items-stretch [&_li]:mx-2.5 animate-scroll-x ${
             reverse ? '[animation-direction:reverse]' : ''
-          }`}
+          } ${paused ? '[animation-play-state:paused]' : ''}`}
           aria-hidden={track === 1 ? 'true' : undefined}
         >
           {doubled.map((item, index) => (
-            <li key={`${track}-${index}`} className="flex w-80 md:w-96 shrink-0">
+            <li key={`${track}-${index}`} className="flex w-72 md:w-96 shrink-0">
               <TestimonialCard item={item} />
             </li>
           ))}
@@ -68,6 +75,17 @@ const Testimonials = () => {
   const headingRef = useReveal({ y: 20 });
   const spotlightRef = useReveal({ y: 28 });
 
+  // Pause the marquee animations while the section is offscreen (battery).
+  const rowsRef = useRef(null);
+  const [paused, setPaused] = useState(false);
+  useEffect(() => {
+    const el = rowsRef.current;
+    if (!el || typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+    const obs = new IntersectionObserver(([entry]) => setPaused(!entry.isIntersecting), { threshold: 0 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   const featured = testimonials[0];
   const rest = testimonials.length > 1 ? testimonials.slice(1) : testimonials;
   const rowA = rest;
@@ -75,9 +93,14 @@ const Testimonials = () => {
 
   return (
     <section id="trusted" className="py-16 md:py-24 lg:py-32 bg-ink-900 overflow-hidden">
-      <h2 ref={headingRef} className="text-center text-xl md:text-2xl text-fog-500 mb-10 md:mb-14">
-        Trusted By Brands &amp; Artists
-      </h2>
+      <div ref={headingRef} className="px-5 md:px-8 mb-10 md:mb-14 text-center">
+        <p className="text-accent text-xs md:text-sm font-semibold uppercase tracking-[0.25em] mb-3">
+          Testimonials
+        </p>
+        <h2 className="text-3xl md:text-5xl font-heading font-bold text-fog-100">
+          Trusted by brands &amp; artists
+        </h2>
+      </div>
 
       {/* Spotlight — the lead testimonial, front and centre. */}
       {featured && (
@@ -103,12 +126,12 @@ const Testimonials = () => {
       )}
 
       {/* Two counter-scrolling rows. */}
-      <div className="relative w-full space-y-4 md:space-y-5">
+      <div ref={rowsRef} className="relative w-full space-y-4 md:space-y-5">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 md:w-32 bg-gradient-to-r from-ink-900 to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 md:w-32 bg-gradient-to-l from-ink-900 to-transparent" />
 
-        <MarqueeRow items={rowA} />
-        <MarqueeRow items={rowB} reverse />
+        <MarqueeRow items={rowA} paused={paused} />
+        <MarqueeRow items={rowB} reverse paused={paused} />
       </div>
     </section>
   );

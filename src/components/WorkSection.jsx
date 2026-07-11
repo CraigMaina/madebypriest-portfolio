@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import { GoX, GoArrowUpRight } from 'react-icons/go';
 import { FaPlay } from 'react-icons/fa';
 import { useContent } from '../sanity/content';
@@ -40,6 +40,36 @@ const WorkSection = ({ setReferralProject }) => {
   // with a child-stagger reveal would let them fight and strand cards hidden.
   const gridRef = useReveal({ y: 24, start: 'top 82%' });
   const didMountRef = useRef(false);
+
+  // Per-audience project counts for the filter rail.
+  const counts = useMemo(() => {
+    const c = { All: projects.length };
+    for (const label of AUDIENCES) {
+      if (label !== 'All') c[label] = projects.filter((p) => p.audience === label).length;
+    }
+    return c;
+  }, [projects]);
+
+  // Sliding accent indicator behind the active tab.
+  const trackRef = useRef(null);
+  const indicatorRef = useRef(null);
+  const indicatorInitRef = useRef(false);
+  useLayoutEffect(() => {
+    const track = trackRef.current;
+    const indicator = indicatorRef.current;
+    if (!track || !indicator) return;
+    const activeEl = [...track.querySelectorAll('[data-tab]')].find((el) => el.dataset.tab === filter);
+    if (!activeEl) return;
+    const vars = { x: activeEl.offsetLeft, width: activeEl.offsetWidth };
+    // First paint (and reduced-motion) snap into place; later changes slide.
+    if (!indicatorInitRef.current || prefersReducedMotion()) {
+      gsap.set(indicator, vars);
+    } else {
+      gsap.to(indicator, { ...vars, duration: DURATION.base, ease: EASE.move });
+      activeEl.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    }
+    indicatorInitRef.current = true;
+  }, [filter]);
 
   const changeFilter = (label) => setFilter(label);
 
@@ -116,26 +146,46 @@ const WorkSection = ({ setReferralProject }) => {
             </p>
           </div>
 
-          {/* Audience filter tabs */}
-          <div className="flex flex-wrap gap-2 shrink-0" role="tablist" aria-label="Filter work by audience">
-            {AUDIENCES.map((label) => {
-              const active = filter === label;
-              return (
-                <button
-                  key={label}
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => changeFilter(label)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${
-                    active
-                      ? 'bg-accent text-ink-900'
-                      : 'border border-ink-600 text-fog-300 hover:border-fog-500 hover:text-fog-100'
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
+          {/* Audience filter rail — horizontal, never wraps; a sliding accent
+              indicator marks the active tab. Edge fades hint at scrollability. */}
+          <div className="relative w-full md:w-auto md:max-w-[60%] md:shrink-0">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-6 bg-gradient-to-r from-ink-900 to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-6 bg-gradient-to-l from-ink-900 to-transparent" />
+            <div
+              className="no-scrollbar overflow-x-auto overscroll-x-contain snap-x scroll-px-4 -mx-1 px-1 py-1"
+              role="tablist"
+              aria-label="Filter work by audience"
+            >
+              <div ref={trackRef} className="relative flex w-max gap-2">
+                <span
+                  ref={indicatorRef}
+                  aria-hidden="true"
+                  className="absolute left-0 top-0 bottom-0 z-0 w-0 rounded-full bg-accent"
+                />
+                {AUDIENCES.map((label) => {
+                  const active = filter === label;
+                  return (
+                    <button
+                      key={label}
+                      data-tab={label}
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => changeFilter(label)}
+                      className={`relative z-10 snap-start whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ${
+                        active ? 'text-ink-900' : 'text-fog-300 hover:text-fog-100'
+                      }`}
+                    >
+                      {label}
+                      <span
+                        className={`ml-1.5 text-xs tabular-nums ${active ? 'text-ink-900/60' : 'text-fog-500'}`}
+                      >
+                        {counts[label] ?? 0}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </header>
 
@@ -154,6 +204,7 @@ const WorkSection = ({ setReferralProject }) => {
                   project={project}
                   index={index}
                   matches={matches}
+                  featured={index === 0}
                   onOpen={openModal}
                 />
               );
@@ -170,12 +221,14 @@ const WorkSection = ({ setReferralProject }) => {
 };
 
 // --- ProjectCard ---
-const ProjectCard = ({ project, index, matches, onOpen }) => {
+const ProjectCard = ({ project, index, matches, featured = false, onOpen }) => {
   const [preview, setPreview] = useState(false);
   const videoRef = useRef(null);
-  // Hover-scrub preview only exists for reels with a real hosted URL. The demo
-  // entries use placeholder paths, so this stays dormant (thumbnail-only) until
-  // real video URLs are supplied.
+  const cardRef = useRef(null);
+  // Preview only exists for reels with a real hosted URL. The demo entries use
+  // placeholder paths, so this stays dormant (thumbnail-only) until real video
+  // URLs are supplied. On fine pointers it's hover-driven; on touch it's driven
+  // by an in-view observer below.
   const playable = isPlayable(project.videoUrl);
   const finePointer =
     typeof window !== 'undefined' && window.matchMedia?.('(pointer: fine)').matches;
@@ -195,21 +248,44 @@ const ProjectCard = ({ project, index, matches, onOpen }) => {
     }
   }, [preview]);
 
+  // Touch: auto-preview the card while it sits in the middle band of the
+  // viewport. The center-only rootMargin means roughly one card plays at a time,
+  // and it pauses (preview=false) as soon as it leaves the band — cheap on
+  // battery. No-op on fine pointers (hover handles it) and when not playable.
+  useEffect(() => {
+    // Reduced-motion users get no auto-playing video (a complete static experience).
+    if (!playable || finePointer || prefersReducedMotion()) return;
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+    const el = cardRef.current;
+    if (!el || !matches) return;
+    const obs = new IntersectionObserver(([entry]) => setPreview(entry.isIntersecting), {
+      rootMargin: '-40% 0px -40% 0px',
+      threshold: 0,
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [playable, finePointer, matches]);
+
   return (
     <button
+      ref={cardRef}
       type="button"
       data-card
       aria-hidden={!matches}
       tabIndex={matches ? 0 : -1}
       onClick={() => onOpen(project)}
       onPointerEnter={() => playable && finePointer && setPreview(true)}
-      onPointerLeave={() => setPreview(false)}
+      onPointerLeave={() => finePointer && setPreview(false)}
       aria-label={`Preview ${project.title} — ${project.category}`}
-      className={`group relative w-full mb-5 md:mb-6 break-inside-avoid overflow-hidden rounded-card border border-ink-700 bg-ink-800 text-left transition duration-500 ease-out hover:-translate-y-1.5 hover:border-accent/60 hover:shadow-[0_24px_50px_-20px_rgba(0,0,0,0.85)] active:scale-[0.98] ${
-        matches ? 'block' : 'hidden'
-      }`}
+      className={`group relative w-full mb-5 md:mb-6 overflow-hidden rounded-card border border-ink-700 bg-ink-800 text-left transition duration-500 ease-out hover:-translate-y-1.5 hover:border-accent/60 hover:shadow-[0_24px_50px_-20px_rgba(0,0,0,0.85)] active:scale-[0.98] ${
+        featured ? '[column-span:all]' : 'break-inside-avoid'
+      } ${matches ? 'block' : 'hidden'}`}
     >
-      <div className={`relative w-full ${aspectClass(project.orientation)}`}>
+      <div
+        className={`relative w-full ${
+          featured ? 'aspect-[16/10] sm:aspect-[2.4/1]' : aspectClass(project.orientation)
+        }`}
+      >
         <img
           src={project.thumbnail}
           alt={`${project.title} — ${project.category}`}
@@ -238,28 +314,49 @@ const ProjectCard = ({ project, index, matches, onOpen }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-ink-900 via-ink-900/25 to-transparent" />
         <div className="absolute inset-0 bg-accent/0 group-hover:bg-accent/5 transition-colors duration-500" />
 
-        {/* Top row: type badge + index */}
-        <span className="absolute top-3 left-3 z-10 text-[11px] font-semibold uppercase tracking-wider bg-ink-900/70 text-fog-100 px-2.5 py-1 rounded-full backdrop-blur-sm">
-          {project.type}
-        </span>
+        {/* Top row: type badge + timecode + index */}
+        <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5">
+          <span className="text-[11px] font-semibold uppercase tracking-wider bg-ink-900/70 text-fog-100 px-2.5 py-1 rounded-full backdrop-blur-sm">
+            {project.type}
+          </span>
+          {project.duration && (
+            <span className="font-mono text-[11px] tabular-nums bg-ink-900/70 text-fog-100 px-2 py-1 rounded-full backdrop-blur-sm">
+              {project.duration}
+            </span>
+          )}
+        </div>
         <span className="absolute top-3 right-4 z-10 font-heading font-bold text-sm text-fog-100/70 tabular-nums">
           {String(index + 1).padStart(2, '0')}
         </span>
 
-        {/* Play affordance */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-          <span className="flex items-center justify-center w-14 h-14 rounded-full bg-accent text-ink-900 shadow-card">
-            <FaPlay className="ml-0.5" aria-hidden="true" />
+        {/* Play affordance — reveals on hover (fine pointers) and stays visible
+            on touch (no hover), so touch cards read as playable video. */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-y-0">
+          <span className="flex items-center justify-center w-11 h-11 md:w-14 md:h-14 rounded-full bg-accent/90 md:bg-accent text-ink-900 shadow-card backdrop-blur-sm">
+            <FaPlay className="ml-0.5 text-sm md:text-base" aria-hidden="true" />
           </span>
         </div>
 
-        {/* Editorial caption: category eyebrow + title + arrow */}
-        <div className="absolute inset-x-0 bottom-0 p-4 md:p-5 flex items-end justify-between gap-3">
+        {/* Editorial caption: category eyebrow + title (+ result on featured) */}
+        <div
+          className={`absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 ${
+            featured ? 'p-5 md:p-7' : 'p-4 md:p-5'
+          }`}
+        >
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent/90 mb-1 truncate">
-              {project.category}
+              {featured ? `Featured · ${project.category}` : project.category}
             </p>
-            <h3 className="text-lg md:text-xl font-heading font-bold text-fog-100 truncate">{project.title}</h3>
+            <h3
+              className={`font-heading font-bold text-fog-100 truncate ${
+                featured ? 'text-2xl md:text-4xl' : 'text-lg md:text-xl'
+              }`}
+            >
+              {project.title}
+            </h3>
+            {featured && project.result && (
+              <p className="mt-1.5 text-sm md:text-base text-fog-300 truncate">{project.result}</p>
+            )}
           </div>
           <GoArrowUpRight
             className="shrink-0 text-xl text-fog-100/70 group-hover:text-accent transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -373,7 +470,7 @@ const VideoModal = ({ project, onClose, onStartProject }) => {
       <div ref={panelRef} className={`relative z-[1000] w-full ${isPortrait ? 'max-w-sm' : 'max-w-4xl'}`}>
         <div className="fixed inset-0 -z-10" onClick={requestClose} aria-hidden="true" />
 
-        <div className={`relative w-full ${aspectClass(project.orientation)} max-h-[72vh] mx-auto overflow-hidden rounded-card bg-black border border-ink-700`}>
+        <div className={`relative w-full ${aspectClass(project.orientation)} max-h-[72svh] mx-auto overflow-hidden rounded-card bg-black border border-ink-700`}>
           {!isPlayable(project.videoUrl) || videoFailed ? (
             <div
               className="w-full h-full flex flex-col items-center justify-center bg-center bg-cover"

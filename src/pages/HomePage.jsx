@@ -128,7 +128,7 @@ function HomePage() {
         <CardNav items={navItems} ready={!isLoading} />
 
         {/* Hero */}
-        <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+        <div className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden">
           <div ref={heroBgRef} className="absolute -top-[12%] -bottom-[12%] inset-x-0 z-0">
             <HeroBackground
               waveColor={[1.0, 1.0, 1.0]}
@@ -177,7 +177,7 @@ function HomePage() {
         {/* Curved dual-row marquee (scroll-velocity reactive) */}
         <CurvedLoop
           marqueeText="Helping ✦ Brands ✦ Tell ✦ Stories ✦ That ✦ Sell ✦"
-          secondaryText="Cinematic ✦ Edits ✦ That ✦ Turn ✦ Attention ✦ Into ✦ Fans ✦"
+          secondaryText="Ads ✦ Lifestyle ✦ Music ✦ Brand Films ✦"
           speed={3}
           curveAmount={16}
           direction="left"

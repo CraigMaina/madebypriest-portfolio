@@ -19,6 +19,7 @@ const MarqueeRow = ({
   const measureRef = useRef(null);
   const textPathRef = useRef(null);
   const pathRef = useRef(null);
+  const containerRef = useRef(null);
   const [spacing, setSpacing] = useState(0);
   const [offset, setOffset] = useState(0);
   const uid = useId();
@@ -59,8 +60,9 @@ const MarqueeRow = ({
     if (!spacing || !ready) return;
     // Respect prefers-reduced-motion: hold static (dragging still works).
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    lastScrollRef.current = window.scrollY || 0;
+
     let frame = 0;
+    let running = false;
     const step = () => {
       // Scroll-velocity influence, smoothed and clamped so fast flings stay tasteful.
       const y = window.scrollY || 0;
@@ -82,8 +84,30 @@ const MarqueeRow = ({
       }
       frame = requestAnimationFrame(step);
     };
-    frame = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frame);
+    const start = () => {
+      if (running) return;
+      running = true;
+      lastScrollRef.current = window.scrollY || 0;
+      frame = requestAnimationFrame(step);
+    };
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(frame);
+    };
+
+    // Only tick while the band is on screen — no wasted rAF/battery offscreen.
+    const el = containerRef.current;
+    let observer;
+    if (el && 'IntersectionObserver' in window) {
+      observer = new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop()));
+      observer.observe(el);
+    } else {
+      start();
+    }
+    return () => {
+      stop();
+      observer?.disconnect();
+    };
   }, [spacing, speed, ready, scrollSign]);
 
   const onPointerDown = (e) => {
@@ -118,6 +142,7 @@ const MarqueeRow = ({
 
   return (
     <div
+      ref={containerRef}
       className="w-full flex items-center justify-center overflow-hidden"
       style={{ visibility: ready ? 'visible' : 'hidden', cursor: cursorStyle }}
       onPointerDown={onPointerDown}

@@ -51,7 +51,11 @@ export default function MotionProvider({ children }) {
       const target = document.querySelector(id);
       if (!target) return; // let the router / browser handle cross-page hashes
       e.preventDefault();
-      lenis.scrollTo(target, { offset: -80 });
+      // Clear the fixed nav by its actual current height (condensed vs expanded,
+      // and different across breakpoints) rather than a hard-coded guess.
+      const nav = document.querySelector('.card-nav');
+      const offset = nav ? nav.getBoundingClientRect().bottom + 16 : 80;
+      lenis.scrollTo(target, { offset: -offset });
     };
     document.addEventListener('click', onAnchorClick);
 
