@@ -100,13 +100,15 @@ void main() {
     float effect = 1.0 - smoothstep(0.0, mouseRadius, dist);
     f -= 0.5 * effect;
   }
-  // Colour field matching the mobile hero mesh: amber (top-left), blue
-  // (bottom-right), magenta (top-right), blended by inverse-square distance to
-  // three poles. Only the colour changes here — the wave pattern (f) and the
-  // Bayer dither downstream are untouched. waveColor stays a neutral multiplier.
+  // Warm, amber-led colour field: amber (top-left) is the signature; the cool
+  // pole (bottom-right) is a muted desaturated steel — present as depth, not a
+  // saturated rainbow band — and the third pole a warm muted rose so the whole
+  // field stays in the warm family. Blended by inverse-square distance to three
+  // poles. Only the colour changes here — the wave pattern (f) and the Bayer
+  // dither downstream are untouched. waveColor stays a neutral multiplier.
   vec3 amber = vec3(0.902, 0.706, 0.314);
-  vec3 blue = vec3(0.431, 0.549, 0.882);
-  vec3 magenta = vec3(0.804, 0.353, 0.529);
+  vec3 blue = vec3(0.360, 0.412, 0.510);
+  vec3 magenta = vec3(0.678, 0.400, 0.427);
   vec2 dA = uv - vec2(-0.45, 0.30);
   vec2 dB = uv - vec2(0.45, -0.35);
   vec2 dM = uv - vec2(0.35, 0.30);
@@ -307,7 +309,7 @@ export default function Dither({
       className="w-full h-full relative"
       camera={{ position: [0, 0, 6] }}
       dpr={1}
-      gl={{ antialias: true, preserveDrawingBuffer: true }}
+      gl={{ antialias: false, preserveDrawingBuffer: false }}
     >
       <DitheredWaves
         waveSpeed={waveSpeed}

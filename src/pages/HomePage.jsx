@@ -133,12 +133,12 @@ function HomePage() {
             <HeroBackground
               waveColor={[1.0, 1.0, 1.0]}
               disableAnimation={false}
-              enableMouseInteraction={true}
+              enableMouseInteraction={false}
               mouseRadius={0.3}
               colorNum={30}
               waveAmplitude={0.3}
               waveFrequency={2.4}
-              waveSpeed={0.05}
+              waveSpeed={0.035}
             />
           </div>
           <div ref={heroRef} className="relative z-10 text-center px-5 md:px-8 max-w-5xl mx-auto">
